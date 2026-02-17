@@ -4,6 +4,7 @@ import sendResponse from "../../utils/sendResponse";
 import { driverServices } from "./driver.service.";
 import httpStatus  from 'http-status';
 import { DriverCreateBasicInput } from "./driver.valedition";
+import AppError from "../../error/AppError";
 
 
 
@@ -42,7 +43,35 @@ export const uploadDriverImage = catchAsync(async (req: Request, res: Response) 
 
 
 
+
+ const updateDriverLocationByAddress = catchAsync(async (req, res) => {
+    const { address } = req.body;
+
+    if (!address) {
+      throw new AppError(400, 'Address is required');
+    }
+
+    const result =
+      await driverServices.updateLocationFromAddress(
+        req.user.id,
+        address,
+      );
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Location updated successfully',
+      data: result,
+    });
+  },
+);
+
+
+
+
+
 export const driverController = {
   createDriver,
   uploadDriverImage,
+  updateDriverLocationByAddress,
 };

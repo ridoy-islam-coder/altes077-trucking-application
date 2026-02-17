@@ -3,6 +3,8 @@ import  httpStatus  from 'http-status';
 import { DriverModel } from "./dirver.model";
 import { DriverCreateBasicInput, driverCreateBasicSchema } from "./driver.valedition";
 import { uploadToS3 } from "../../utils/fileHelper";
+import axios from "axios";
+import config from "../../config";
 
 
 
@@ -64,6 +66,44 @@ const driverCreateService = async (
 
 
 
+ const updateLocationFromAddress = async (
+  userId: string,
+  address: string,
+) => {
+  // 🔹 Google Geocoding API
+  const googleUrl = `https://maps.googleapis.com/maps/api/geocode/json`;
+
+  const response = await axios.get(googleUrl, {
+    params: {
+      address,
+      key: config.google_maps_api_key,
+    },
+  });
+
+  if (
+    response.data.status !== 'OK' ||
+    !response.data.results.length
+  ) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid address');
+  }
+
+  const location = response.data.results[0].geometry.location;
+
+  const driver = await DriverModel.findOne({ userId });
+  if (!driver) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Driver not found');
+  }
+
+  driver.location = {
+    lat: location.lat,
+    lng: location.lng,
+  };
+
+  await driver.save();
+
+  return driver.location;
+};
+
 
 
 
@@ -74,4 +114,5 @@ const driverCreateService = async (
 export const driverServices = {
   driverCreateService,  
   driverUploadImageService,
+  updateLocationFromAddress,
 };

@@ -10,6 +10,8 @@ const router = Router();
 router.post('/createDriver',auth('agencies'), driverController.createDriver);
 router.post('/upload-image',auth('agencies'), upload.single('file'), driverController.uploadDriverImage);
 
+router.patch('/location/by-address',auth(),driverController.updateDriverLocationByAddress);
+
 
 
 
