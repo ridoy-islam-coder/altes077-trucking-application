@@ -45,6 +45,7 @@ export interface TUser {
   accountType?: 'emailvarifi' | 'google' | 'facebook' | 'linkedin' | 'apple';
   countryCode: string;
   fcmToken?: string;
+  soketId?: string;
 }
 
 export interface UserModel extends Model<TUser> {

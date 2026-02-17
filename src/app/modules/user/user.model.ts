@@ -106,7 +106,10 @@ const UserSchema = new Schema<TUser, UserModel>(
         default: 'active',
       },
     },
-
+   
+    soketId: {
+      type: String,
+    },
     isActive: {
       type: Boolean,
       default: true,
