@@ -31,6 +31,20 @@ const rideSchema = new Schema(
       enum: ['pending', 'accepted', 'completed', 'cancelled'],
       default: 'pending',
     },
+    duration: {
+      type: Number,
+      required: true,
+    },//in seconds
+    distance: {
+      type: Number,
+      required: true,
+    }, //in meters
+    paymentId: {
+      type: String,
+    },
+    orderId:{
+      type: String,
+    },
     timestamp: {
       type: Date,
       default: Date.now,
