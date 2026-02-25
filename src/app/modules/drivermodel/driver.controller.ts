@@ -44,36 +44,156 @@ export const uploadDriverImage = catchAsync(async (req: Request, res: Response) 
 
 
 
- const updateDriverLocationByAddress = catchAsync(async (req, res) => {
-    const { address } = req.body;
+//  const updateDriverLocationByAddress = catchAsync(async (req, res) => {
+//     const { address } = req.body;
 
-    if (!address) {
-      throw new AppError(400, 'Address is required');
+//     if (!address) {
+//       throw new AppError(400, 'Address is required');
+//     }
+
+//     const result =
+//       await driverServices.updateLocationFromAddress(
+//         req.user.id,
+//         address,
+//       );
+
+//     sendResponse(res, {
+//       statusCode: 200,
+//       success: true,
+//       message: 'Location updated successfully',
+//       data: result,
+//     });
+//   },
+// );
+
+
+// AIzaSyCB3G-ob1C6JEUF_wotuQY1RMPKIbRkPIw
+
+
+
+
+
+
+
+
+
+
+const getCoordinatesController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { address } = req.query;
+
+    if (!address || typeof address !== "string") {
+      res.status(400).json({
+        success: false,
+        message: "Address is required",
+      });
+      return;
     }
 
-    const result =
-      await driverServices.updateLocationFromAddress(
-        req.user.id,
-        address,
-      );
+    const coordinates = await driverServices.getAddressCoordinate(address);
 
-    sendResponse(res, {
-      statusCode: 200,
+    res.status(200).json({
       success: true,
-      message: 'Location updated successfully',
+      data: coordinates,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
+
+
+
+
+
+/* ===== Distance & Time ===== */
+ const getDistanceTimeController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { origin, destination } = req.query;
+
+    const result = await driverServices.getDistanceTime(
+      origin as string,
+      destination as string
+    );
+
+    res.status(200).json({
+      success: true,
       data: result,
     });
-  },
-);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
+/* ===== Auto Complete ===== */
+ const getAutoCompleteController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { input } = req.query;
+
+    const suggestions = await driverServices.getAutoCompleteSuggestions(input as string);
+
+    res.status(200).json({
+      success: true,
+      data: suggestions,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/* ===== Captains in Radius ===== */
+ const getCaptainsInRadiusController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { ltd, lng, radius } = req.query;
+
+    const captains = await driverServices.getCaptainsInTheRadius(
+      Number(ltd),
+      Number(lng),
+      Number(radius)
+    );
+
+    res.status(200).json({
+      success: true,
+      data: captains,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 
 
 
 export const driverController = {
+  getDistanceTimeController,
+  getAutoCompleteController,
+  getCaptainsInRadiusController,
   createDriver,
   uploadDriverImage,
-  updateDriverLocationByAddress,
+  getCoordinatesController,
 };
 
 

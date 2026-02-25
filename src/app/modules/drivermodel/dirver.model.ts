@@ -50,16 +50,23 @@ const driverSchema = new Schema(
       required: true,
     },
     
-    location: {
-        lng: {
-            type: Number,
+    // location: {
+    //     lng: {
+    //         type: Number,
           
-        },
-        lat: {
-            type: Number,
+    //     },
+    //     ltd: {
+    //         type: Number,
            
-        },
-    },
+    //     },
+    // },
+
+    
+   location: {
+  type: { type: String, enum: ["Point"], default: "Point" },
+  coordinates: { type: [Number], required: true } // [lng, lat]
+},
+
 
     timestamp: {
       type: Date,
@@ -72,3 +79,5 @@ const driverSchema = new Schema(
 );
 
 export const DriverModel = model('Driver', driverSchema);
+
+driverSchema.index({ location: "2dsphere" })
