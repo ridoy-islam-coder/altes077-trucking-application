@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import { driverServices } from "./driver.service.";
+import { driverServices, getExactStreetAddress } from "./driver.service.";
 import httpStatus  from 'http-status';
 import { DriverCreateBasicInput } from "./driver.valedition";
 import AppError from "../../error/AppError";
@@ -187,6 +187,59 @@ const getCoordinatesController = async (
 
 
 
+export const getAddressFromCoordinatesController = async (req: Request, res: Response) => {
+  try {
+    const { lat, lng } = req.body;
+
+    if (lat === undefined || lng === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "Latitude and longitude are required",
+      });
+    }
+
+    const address = await driverServices.getAddressFromCoordinates(lat, lng);
+
+    res.json({
+      success: true,
+      data: { address },
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+
+
+
+export const getExactStreetAddressController = async (req: Request, res: Response) => {
+  try {
+    const { lat, lng } = req.body;
+
+    if (lat === undefined || lng === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "Latitude and longitude are required",
+      });
+    }
+
+    const address = await getExactStreetAddress(lat, lng);
+
+    res.json({
+      success: true,
+      data: { address },
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+
+
 export const driverController = {
   getDistanceTimeController,
   getAutoCompleteController,
@@ -194,6 +247,8 @@ export const driverController = {
   createDriver,
   uploadDriverImage,
   getCoordinatesController,
+  getAddressFromCoordinatesController,
+  getExactStreetAddressController,
 };
 
 

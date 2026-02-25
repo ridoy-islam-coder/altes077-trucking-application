@@ -260,8 +260,101 @@ export const getCaptainsInTheRadius = async (lat: number, lng: number, radius: n
 
 
 
+const getAddressFromCoordinates = async (lat: number, lng: number): Promise<string> => {
+  if (lat === undefined || lng === undefined) {
+    throw new Error("Latitude and longitude are required");
+  }
+
+  const apiKey = GOOGLE_MAPS_API;
+  if (!apiKey) throw new Error("Google Maps API key not found");
+
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+
+  const response = await axios.get(url);
+
+  if (response.data.status !== "OK" || !response.data.results.length) {
+    throw new Error("Unable to fetch address");
+  }
+
+  return response.data.results[0].formatted_address;
+};
 
 
+
+
+
+
+// export const getAddressFromCoordinates = async (lat: number, lng: number): Promise<string> => {
+//   if (lat === undefined || lng === undefined) {
+//     throw new Error("Latitude and longitude are required");
+//   }
+
+//   if (!GOOGLE_MAPS_API) throw new Error("Google Maps API key not found");
+
+//   const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API}`;
+
+//   const response = await axios.get(url);
+
+//   if (response.data.status !== "OK" || !response.data.results.length) {
+//     throw new Error("Unable to fetch address");
+//   }
+
+//   const result = response.data.results[0];
+
+//   // শুধু যা দরকার সেই অংশ extract করি
+//   let city = "";
+//   let country = "";
+
+//   result.address_components.forEach((comp: any) => {
+//     if (comp.types.includes("locality") || comp.types.includes("sublocality_level_1")) {
+//       city = comp.long_name;
+//     }
+//     if (comp.types.includes("country")) {
+//       country = comp.long_name;
+//     }
+//   });
+
+//   // যদি city না পাওয়া যায়, fallback to formatted_address
+//   if (!city) city = result.formatted_address;
+
+//   return `${city}, ${country}`; // উদাহরণ: "Dhaka, Bangladesh"
+// };
+
+
+
+
+export const getExactStreetAddress = async (lat: number, lng: number): Promise<string> => {
+  if (lat === undefined || lng === undefined) {
+    throw new Error("Latitude and longitude are required");
+  }
+
+  if (!GOOGLE_MAPS_API) throw new Error("Google Maps API key not found");
+
+  try {
+    // Try with street address type first
+    let url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&result_type=street_address&key=${GOOGLE_MAPS_API}`;
+    let res = await fetch(url);
+    let data = await res.json();
+
+    if (data.status === "OK" && data.results.length > 0) {
+      return data.results[0].formatted_address;
+    }
+
+    // Fallback to normal reverse geocode
+    url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API}`;
+    res = await fetch(url);
+    data = await res.json();
+
+    if (data.status === "OK" && data.results.length > 0) {
+      return data.results[0].formatted_address;
+    }
+
+    return "Address not found";
+  } catch (error) {
+    console.error("Geocode error:", error);
+    return "Address error";
+  }
+};
 
 
 export const driverServices = {
@@ -271,4 +364,5 @@ export const driverServices = {
   getAutoCompleteSuggestions,
   getCaptainsInTheRadius,
   getAddressCoordinate,
+  getAddressFromCoordinates,
 };
