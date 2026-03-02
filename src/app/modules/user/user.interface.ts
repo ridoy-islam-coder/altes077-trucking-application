@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Model } from 'mongoose';
 export enum UserRole {
-  agencies = 'agencies',
+  USER = 'USER',
   admin = 'admin',
-  influencer = 'influencer',
+  DRIVER = 'DRIVER',
 }
 export enum status {
   pending = 'pending',
   active = 'active',
   blocked = 'blocked',
 }
-
+type Status = 'active' | 'inactive';
 // export enum Gender {
 //   Male = 'Male',
 //   Female = 'Female',
@@ -37,7 +37,7 @@ export interface TUser {
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
   role: UserRole;
-  status?: status;
+  status?: Status;
   isVerified: boolean;
   isActive: boolean;
   isDeleted: boolean;

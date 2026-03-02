@@ -5,7 +5,7 @@ import config from '../../config';
 
 import { Types } from 'mongoose';
 import { TUser, UserModel, UserRole } from './user.interface';
-import { de } from 'zod/v4/locales';
+
 
 // Define the schema for Verification
 const VerificationSchema = new Schema({
@@ -55,7 +55,6 @@ const UserSchema = new Schema<TUser, UserModel>(
       required: function(this: TUser) {
       return this.isVerified === true;
        },
-      default: '',
       select: false,
     },
     countryCode: {
@@ -79,13 +78,18 @@ const UserSchema = new Schema<TUser, UserModel>(
     },
     passwordChangedAt: {
       type: Date,
+
     },
     accountType: {
       type: String,
       enum: ['emailvarifi', 'google', 'facebook', 'linkedin', 'apple'],
       default: 'emailvarifi',
     },
- 
+     status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "inactive",
+    },
     role: {
       type: String,
       enum: Object.values(UserRole),

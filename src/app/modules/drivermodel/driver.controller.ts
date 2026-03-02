@@ -5,41 +5,77 @@ import { driverServices, getExactStreetAddress } from "./driver.service.";
 import httpStatus  from 'http-status';
 import { DriverCreateBasicInput } from "./driver.valedition";
 import AppError from "../../error/AppError";
-
-
-
-
+import { DriverModel } from "./dirver.model";
+import User from "../user/user.model";
 
 
 
 
 export const createDriver = catchAsync(async (req: Request, res: Response) => {
-  const driverData: DriverCreateBasicInput = req.body;
+  if (!req.user || !req.user.id) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  }
 
-  const result = await driverServices.driverCreateService(req.user.id, driverData);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Driver created successfully',
-    data: result,
-  });
-});
-
-
-export const uploadDriverImage = catchAsync(async (req: Request, res: Response) => {
-  const file = req.file;
   const userId = req.user.id;
 
-  const driver = await driverServices.driverUploadImageService(userId, file!);
+  const { vehicleType, vehicleNumber, vehicleCapacity, vehicleColor, hourRate, location } = req.body;
+
+  if (!vehicleType || !vehicleNumber || !vehicleCapacity || !vehicleColor || !hourRate || !location?.coordinates) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'All driver fields are required');
+  }
+
+  const driver = await driverServices.driverCreateService(userId, {
+    vehicleType,
+    vehicleNumber,
+    vehicleCapacity,
+    vehicleColor,
+    hourRate,
+    location,
+  });
 
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: httpStatus.CREATED,
     success: true,
-    message: 'Driver image uploaded successfully',
+    message: 'Driver created successfully',
     data: driver,
   });
 });
+
+
+
+
+
+
+export const uploadMultipleDriverImages = catchAsync(
+  async (req: Request, res: Response) => {
+    const files = req.files as Express.Multer.File[];
+    if (!files || files.length === 0) throw new AppError(httpStatus.BAD_REQUEST, 'No files uploaded');
+    if (!req.user || !req.user.id) throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+
+    const userId = req.user.id;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+
+    // Find driver linked to this user
+    const driver = await DriverModel.findOne({ userId: user._id });
+    if (!driver) throw new AppError(httpStatus.NOT_FOUND, 'Driver profile not found');
+
+    const uploadedDrivers = [];
+    for (const file of files) {
+      const uploaded = await driverServices.driverUploadImageService(driver._id.toString(), file);
+      uploadedDrivers.push(uploaded);
+    }
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Driver images uploaded successfully',
+      data: uploadedDrivers,
+    });
+  }
+);
 
 
 
@@ -245,7 +281,8 @@ export const driverController = {
   getAutoCompleteController,
   getCaptainsInRadiusController,
   createDriver,
-  uploadDriverImage,
+  // uploadDriverImage,
+  uploadMultipleDriverImages,
   getCoordinatesController,
   getAddressFromCoordinatesController,
   getExactStreetAddressController,

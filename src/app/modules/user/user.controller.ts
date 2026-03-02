@@ -29,8 +29,6 @@ const updatePhoneNumber = catchAsync(async (req: Request, res: Response) => {
 
 
 
-
-
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
   let image;
 
@@ -40,7 +38,7 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   }
 
   // Check role
-  const isAdmin = req.user.role === 'agencies' || req.user.role === 'influencer';
+  const isAdmin = req.user.role === 'USER' || req.user.role === 'DRIVER';
 
   // User can update own profile, admin can update others
   const userIdToUpdate =

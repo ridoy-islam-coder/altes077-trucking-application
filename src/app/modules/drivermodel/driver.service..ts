@@ -5,34 +5,37 @@ import { DriverCreateBasicInput, driverCreateBasicSchema } from "./driver.valedi
 import { uploadToS3 } from "../../utils/fileHelper";
 import axios from "axios";
 import config from "../../config";
+import User from "../user/user.model";
 
 
 
 
-const driverCreateService = async (
-  userId: string,
-  driverData: DriverCreateBasicInput
-) => {
-  // 🔹 Validate request body
-  const parsed = driverCreateBasicSchema.safeParse(driverData);
-  if (!parsed.success) {
-    const message = parsed.error.issues[0]?.message || 'Validation failed';
-    throw new AppError(httpStatus.BAD_REQUEST, message);
-  }
 
-  // 🔹 Check if driver already exists for this user
-  const alreadyExists = await DriverModel.findOne({ userId });
-  if (alreadyExists) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'Driver has already been created for this user'
-    );
-  }
 
-  // 🔹 Create driver
+/* =========================
+   Create Driver (No Images)
+========================= */
+export const driverCreateService = async (userId: string, data: {
+  vehicleType: string;
+  vehicleNumber: string;
+  vehicleCapacity: string;
+  vehicleColor: string;
+  hourRate: number;
+  location: { coordinates: [number, number] };
+}) => {
+  const existingDriver = await DriverModel.findOne({ userId });
+  if (existingDriver) throw new AppError(httpStatus.BAD_REQUEST, 'Driver already exists for this user');
+
   const driver = await DriverModel.create({
-    ...parsed.data,
     userId,
+    vehicleType: data.vehicleType,
+    vehicleNumber: data.vehicleNumber,
+    vehicleCapacity: data.vehicleCapacity,
+    vehicleColor: data.vehicleColor,
+    hourRate: data.hourRate,
+    location: { type: 'Point', coordinates: data.location.coordinates },
+    status: 'inactive',
+    images: [], // initially empty
   });
 
   return driver;
@@ -40,31 +43,24 @@ const driverCreateService = async (
 
 
 
- const driverUploadImageService = async (
-  userId: string,
-  file: Express.Multer.File
-) => {
-  if (!file) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'File is required');
-  }
 
-  const driver = await DriverModel.findOne({ userId });
-  if (!driver) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Driver not found');
-  }
 
-  // Upload file to S3
-  const { id, url } = await uploadToS3(file, `driver-${userId}`);
 
-  // Save in DB
-  driver.image = { id, url };
+
+const MAX_IMAGES = 4;
+
+export const driverUploadImageService = async (driverId: string, file: Express.Multer.File) => {
+  const driver = await DriverModel.findById(driverId);
+  if (!driver) throw new AppError(httpStatus.NOT_FOUND, 'Driver not found');
+
+  if (driver.images.length >= MAX_IMAGES) throw new AppError(httpStatus.BAD_REQUEST, `Cannot upload more than ${MAX_IMAGES} images`);
+
+  const { id, url } = await uploadToS3(file, `driver-${driverId}-${Date.now()}`);
+  driver.images.push({ id, url });
   await driver.save();
 
   return driver;
 };
-
-
-
 
 //  const updateLocationFromAddress = async (
 //   userId: string,

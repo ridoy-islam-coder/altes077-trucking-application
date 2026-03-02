@@ -5,6 +5,8 @@ import { TUser } from "./user.interface";
 import bcrypt from "bcrypt";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { subMonths, startOfMonth } from 'date-fns';
+import sendResponse from "../../utils/sendResponse";
+
 
 
 
@@ -221,7 +223,7 @@ const blockUser = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
 
-  if (user.role === 'admin' || user.role === 'agencies' || user.role === 'influencer') {
+  if (user.role === 'admin' || user.role === 'USER' || user.role === 'DRIVER') {
     throw new AppError(httpStatus.BAD_REQUEST, 'You cannot block an admin');
   }
   if (!user.isActive) {
@@ -247,6 +249,12 @@ const unblockUser = async (id: string) => {
 
   return user;
 };
+
+
+
+
+
+
 
 export const userServices = {
   getme,

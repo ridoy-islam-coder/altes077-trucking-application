@@ -8,7 +8,7 @@ import { generateOtp } from "../../utils/otpGenerator";
 import moment from 'moment';
 import { sendEmail } from '../../utils/mailSender';
 import bcrypt from "bcrypt";
-import { UserRole } from '../user/user.interface';
+import { TUser, UserRole } from '../user/user.interface';
 import User from '../user/user.model';
 import catchAsync from '../../utils/catchAsync';
 
@@ -265,7 +265,7 @@ const forgotPassword = async (email: string) => {
   if (user?.isDeleted) {
     throw new AppError(httpStatus.NOT_FOUND, 'user not found');
   }
-  if (user?.status === 'blocked') {
+  if (user?.status === 'blocked'  as any) {
     throw new AppError(httpStatus.FORBIDDEN, 'your account is inactive');
   }
   const jwtPayload = {
@@ -359,7 +359,7 @@ const refreshToken = async (token: string) => {
   // checking if the user is blocked
   const userStatus = user?.status;
 
-  if (userStatus === 'blocked') {
+  if (userStatus === 'blocked' as any) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
   }
 
@@ -746,6 +746,33 @@ export const verifyOtpAndResetPassword = catchAsync(async (req, res) => {
   });
 });
 
+
+
+
+/* =========================
+   Change User Status using JWT userId
+========================= */
+const changeMyStatusService = async (
+  userId: string,
+  status: 'active' | 'inactive'
+): Promise<TUser> => {
+  const user = await User.findById(userId).select('+password');
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  // ✅ TypeScript safe assignment
+ if (status === 'active' || status === 'inactive') {
+     user.status = status; // ✅ now TypeScript safe
+}
+  await user.save();
+
+  return user.toObject() as TUser;
+};
+
+
+
+
 export const authServices = {
   register,
   verifyEmail,
@@ -754,6 +781,7 @@ export const authServices = {
   verifyOtp,
   verifyOtpAndResetPassword,
   SetPasswordService,
+  changeMyStatusService,
   userVerifyOtp,
   sendVerificationCode,
   changePassword,

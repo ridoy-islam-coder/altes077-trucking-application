@@ -1,50 +1,71 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model,  } from "mongoose";
+import { IRide } from "./ride.interface";
 
-const rideSchema = new Schema(
+/* =========================
+   Ride Schema
+========================= */
+const rideSchema = new Schema<IRide>(
   {
     userId: {
       type: Schema.Types.ObjectId,
       required: true,
-      refPath: 'userType', 
+      refPath: "userType",
       unique: true,
     },
 
     driverId: {
       type: Schema.Types.ObjectId,
-      required: true,
-      refPath: 'userType', 
+      refPath: "userType",
     },
+
     pickup: {
       type: String,
-      required: true,
     },
+
     destination: {
       type: String,
-      required: true,
     },
+
     fare: {
       type: Number,
-      required: true,
     },
+
     status: {
       type: String,
-      enum: ['pending', 'accepted', 'completed', 'cancelled'],
-      default: 'pending',
+      enum: ["pending", "accepted", "ongoing", "completed", "cancelled"],
+      default: "pending",
     },
+
     duration: {
       type: Number,
-      required: true,
-    },//in seconds
+    }, // seconds
+
     distance: {
       type: Number,
-      required: true,
-    }, //in meters
+    }, // meters
+
     paymentId: {
       type: String,
     },
-    orderId:{
+
+    orderId: {
       type: String,
     },
+
+    signature: {
+      type: String,
+    },
+
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+    },
+
+    date: {
+      type: String,
+    },
+
     timestamp: {
       type: Date,
       default: Date.now,
@@ -55,4 +76,7 @@ const rideSchema = new Schema(
   }
 );
 
-export const RideModel = model('Rides', rideSchema);
+/* =========================
+   Model Export
+========================= */
+export const RideModel = model<IRide>("Rides", rideSchema);

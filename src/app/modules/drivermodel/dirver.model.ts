@@ -1,83 +1,109 @@
-
-import { Schema, model } from 'mongoose';
-
-
+import { Schema, model, Types, Document } from "mongoose";
+import { IDriver, IImage } from "./driver.interface";
 
 
 
-const imageSchema = new Schema({
-  id: {
-    type: String, // Allows string or number
-    required: true,
-  },
-  url: {
-    type: String,
-    required: true,
-  },
+
+
+
+const imageSchema = new Schema<IImage>({
+  id: { type: String, required: true },
+  url: { type: String, required: true },
 });
 
-
-const driverSchema = new Schema(
+/* =========================
+   Driver Schema
+========================= */
+const driverSchema = new Schema<IDriver>(
   {
     userId: {
       type: Schema.Types.ObjectId,
       required: true,
-      refPath: 'userType', 
-      unique: true, // 🔹 একটি user একবারই driver create করতে পারবে
+      refPath: "userType",
+      unique: true,
     },
 
-    image: imageSchema,
-    status:{
-        type: String,
-        enum: ['active', 'inactive'],
-        default: 'inactive',
+    // 🔹 Change from single image to array of images
+    images: {
+       type: [imageSchema],
+       validate: [arrayLimit, "{PATH} exceeds the limit of 4"],
+       default: [],
     },
+
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "inactive",
+    },
+
     vehicleType: {
       type: String,
-      required: true,   
-      enum: ['Truck', 'Van', 'Trailer', 'Flatbed', 'Refrigerated', 'Tanker', 'Container', 'Other'], // Example vehicle types
+      required: true,
+      enum: [
+        "Truck",
+        "Van",
+        "Trailer",
+        "Flatbed",
+        "Refrigerated",
+        "Tanker",
+        "Container",
+        "Other",
+      ],
     },
+
     vehicleNumber: {
-     type: String,
-     required: true,
+      type: String,
+      required: true,
     },
+
     vehicleCapacity: {
       type: String,
       required: true,
     },
+
     vehicleColor: {
       type: String,
       required: true,
     },
-    
-    // location: {
-    //     lng: {
-    //         type: Number,
-          
-    //     },
-    //     ltd: {
-    //         type: Number,
-           
-    //     },
-    // },
 
-    
-   location: {
-  type: { type: String, enum: ["Point"], default: "Point" },
-  coordinates: { type: [Number], required: true } // [lng, lat]
-},
+    hourRate: {
+      type: Number,
+      required: true,
+    },
 
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
 
     timestamp: {
       type: Date,
       default: Date.now,
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true }
 );
 
-export const DriverModel = model('Driver', driverSchema);
+/* =========================
+   GEO INDEX
+========================= */
+driverSchema.index({ location: "2dsphere" });
 
-driverSchema.index({ location: "2dsphere" })
+/* =========================
+   Array Validation Function
+========================= */
+function arrayLimit(val: IImage[]) {
+  return val.length <= 4; // max 4 images
+}
+
+/* =========================
+   Export Model
+========================= */
+export const DriverModel = model<IDriver>("Driver", driverSchema);

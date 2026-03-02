@@ -19,11 +19,15 @@ router.post( '/refresh-token',validateRequest(authValidation.refreshTokenValidat
 router.post('/google', authControllers.googleLogin);
 router.post('/appleLogin', authControllers.appleLogin);
 
+
+
 router.post('/codeVerification', authControllers.codeVerification,);
 router.post('/userVerifyOtp', authControllers.verifyOtpController,);
 
-router.patch('/change-password',auth(USER_ROLE.agencies, USER_ROLE.influencer),upload.none(),authControllers.changePassword,);
+router.patch('/change-password',auth(USER_ROLE.DRIVER, USER_ROLE.USER),upload.none(),authControllers.changePassword,);
 router.patch('/reset-password', authControllers.resetPassword);
+router.patch('/status', auth(USER_ROLE.DRIVER, USER_ROLE.USER), authControllers.changeMyStatus);
+
 
 
 

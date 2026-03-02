@@ -7,8 +7,10 @@ import upload from '../../middleware/fileUpload';
 
 const router = Router();
 
-router.post('/createDriver',auth('agencies'), driverController.createDriver);
-router.post('/upload-image',auth('agencies'), upload.single('file'), driverController.uploadDriverImage);
+router.post('/createDriver',auth('DRIVER'), driverController.createDriver);
+// multiple files (max 4)
+router.post( "/upload-image", auth('DRIVER'),upload.array('images', 4),driverController.uploadMultipleDriverImages);
+
 
 // router.patch('/location/by-address',auth(),driverController.updateDriverLocationByAddress);
 

@@ -580,6 +580,30 @@ export const setPasswordController = catchAsync(
 
 
 
+/* =========================
+   Change My Status (JWT based)
+========================= */
+export const changeMyStatus = catchAsync(async (req: Request, res: Response) => {
+  const { status } = req.body;
+
+  if (!req.user || !req.user.id) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  }
+
+  if (!status || !['active', 'inactive'].includes(status)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Status must be "active" or "inactive"');
+  }
+
+  // ✅ Type assertion to fix TS error
+  const updatedUser = await authServices.changeMyStatusService(req.user.id, status as 'active' | 'inactive');
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Your status updated to ${status}`,
+    data: updatedUser,
+  });
+});
 
 export const authControllers = {
   login,
@@ -591,6 +615,7 @@ export const authControllers = {
   changePassword,
   refreshToken,
   googleLogin,
+  changeMyStatus,
   setPasswordController,
   userRegistration,
   appleLogin,

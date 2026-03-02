@@ -1,7 +1,7 @@
 export const USER_ROLE = {
-  agencies: 'agencies',
+  USER: 'USER',
   admin: 'admin',
-  influencer: 'influencer',
+  DRIVER: 'DRIVER',
   
 } as const;
 export type UserRole = typeof USER_ROLE[keyof typeof USER_ROLE];
