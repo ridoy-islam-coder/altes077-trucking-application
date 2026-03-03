@@ -1,5 +1,7 @@
 import os from 'os';
-import chalk from 'chalk';
+// import chalk from 'chalk';
+
+const chalk = require('chalk');
 import packageJson from '../../../package.json'; // App version
 const customUsername = "RK_DEVELOPER";
 export const startupLogger = (port: number) => {
