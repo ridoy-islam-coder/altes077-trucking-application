@@ -10,7 +10,7 @@ export default {
      reset_pass_expire_time: process.env.RESET_TOKEN_EXPIRE_TIME,
      database_url: process.env.DATABASE_URL,
      node_env: process.env.APP_ENV,
-     port: process.env.APP_PORT,
+     port: process.env.MY_APP_KEY || 5000,
      callback_url: process.env.GOOGLE_CALLBACK_URL,
      
 
