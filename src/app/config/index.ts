@@ -9,8 +9,8 @@ export default {
      backend_url: process.env.BACKEND_URL,
      reset_pass_expire_time: process.env.RESET_TOKEN_EXPIRE_TIME,
      database_url: process.env.DATABASE_URL,
-     node_env: process.env.NODE_ENV,
-     port: process.env.PORT,
+     node_env: process.env.APP_ENV,
+     port: process.env.APP_PORT,
      callback_url: process.env.GOOGLE_CALLBACK_URL,
      
 
