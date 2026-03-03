@@ -6,9 +6,7 @@ import globalErrorHandler from './app/middleware/globalErrorhandler';
 import notFound from './app/middleware/notfound';
 import router from './app/routes';
 import config from './app/config';
-// import globalErrorHandler from './app/middleware/globalErrorhandler';
-// import notFound from './app/middleware/notfound';
-// import router from './app/routes';
+
 
 const app: Application = express();
 app.use(express.static('public'));
