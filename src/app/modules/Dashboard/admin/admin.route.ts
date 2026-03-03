@@ -10,13 +10,13 @@ router.post('/adminRegister', adminControllers.adminRegister);
 
 router.post('/login', adminControllers.adminLogin);
 router.get('/me', auth('admin'), adminControllers.getProfile);
-
-router.patch('/update-profile',auth('admin', 'super_admin'),//   upload.single('file'),
+                                      //'super_admin'
+router.patch('/update-profile',auth('admin', ),//   upload.single('file'),
   adminControllers.updateProfile,
 );
 router.patch(
   '/change-password',
-  auth('admin', 'super_admin'),
+  auth('admin', ), //'super_admin'
   adminControllers.changePassword,
 );
 
