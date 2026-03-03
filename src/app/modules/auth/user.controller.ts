@@ -9,7 +9,7 @@ import jwt, { JwtPayload, Secret  } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 import sendResponse from '../../utils/sendResponse';
-import { authServices,   userResetPasswordService, } from './user.service';
+import  {  authServices,  userResetPasswordService, } from './user.service';
 import { UserRole } from '../user/user.interface';
 // import { AuthServices } from './user.service';
 import * as appleSignin from 'apple-signin-auth';

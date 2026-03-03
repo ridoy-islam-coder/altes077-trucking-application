@@ -791,7 +791,7 @@ const changeMyStatusService = async (
   return user.toObject() as TUser;
 };
 
-export const authServices = {
+ export const authServices = {
   register,
   verifyEmail,
   login,
@@ -808,3 +808,5 @@ export const authServices = {
   resetPassword,
   refreshToken,
 };
+
+
