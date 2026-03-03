@@ -11,6 +11,7 @@ export default {
      database_url: process.env.DATABASE_URL,
      node_env: process.env.NODE_ENV,
      port: process.env.PORT,
+     callback_url: process.env.GOOGLE_CALLBACK_URL,
      
 
      bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
@@ -50,13 +51,13 @@ export default {
           authToken: process.env.TWILIO_AUTH_TOKEN || '',
           phoneNumber: process.env.TWILIO_PHONE_NUMBER || '',
      },
-     stripe: {
-          stripe_secret_key: process.env.STRIPE_SECRET_KYE,
-          paymentSuccess_url: process.env.STRIPE_PAYMENT_SUCCESS_URL,
-          stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
-          stripe_webhook_url: process.env.STRIPE_WEBHOOK_URL,
-          stripe_product_id: process.env.STRIPE_PRODUCT_ID,
-     },
+     // stripe: {
+     //      stripe_secret_key: process.env.STRIPE_SECRET_KYE,
+     //      paymentSuccess_url: process.env.STRIPE_PAYMENT_SUCCESS_URL,
+     //      stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
+     //      stripe_webhook_url: process.env.STRIPE_WEBHOOK_URL,
+     //      stripe_product_id: process.env.STRIPE_PRODUCT_ID,
+     // },
      super_admin: {
           email: process.env.SUPER_ADMIN_EMAIL,
           password: process.env.SUPER_ADMIN_PASSWORD,
