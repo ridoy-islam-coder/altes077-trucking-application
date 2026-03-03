@@ -771,13 +771,32 @@ const changeMyStatusService = async (
 };
 
 
+ const updateMyLocationService = async (
+  userId: string,
+  coordinates: [number, number] // [longitude, latitude]
+): Promise<TUser> => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
 
+  user.location = {
+    type: 'Point',
+    coordinates,
+  };
+
+  await user.save();
+
+  // Return object
+  return user.toObject() as TUser;
+};
 
 export const authServices = {
   register,
   verifyEmail,
   login,
   Enteryouremail,
+  updateMyLocationService,
   verifyOtp,
   verifyOtpAndResetPassword,
   SetPasswordService,

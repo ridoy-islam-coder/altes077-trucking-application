@@ -605,6 +605,43 @@ export const changeMyStatus = catchAsync(async (req: Request, res: Response) => 
   });
 });
 
+
+
+ const MyLocation = catchAsync(async (req: Request, res: Response) => {
+  const { latitude, longitude } = req.body; // ✅ declare here
+
+  if (!req.user || !req.user.id) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  }
+
+  if (latitude === undefined || longitude === undefined) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Latitude and Longitude are required');
+  }
+
+  const updatedUser = await authServices.updateMyLocationService(req.user.id, [longitude, latitude]);
+
+  // password remove + response format
+  const { password, location, ...userWithoutPassword } = updatedUser;
+
+  const responseUser = {
+    ...userWithoutPassword,
+    latitude: location.coordinates[1],
+    longitude: location.coordinates[0],
+  };
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User location updated successfully',
+    data: responseUser,
+  });
+});
+
+
+
+
+
+
 export const authControllers = {
   login,
   sendOtp,
@@ -613,6 +650,7 @@ export const authControllers = {
   verifyOtpController,
   codeVerification,
   changePassword,
+  MyLocation,
   refreshToken,
   googleLogin,
   changeMyStatus,

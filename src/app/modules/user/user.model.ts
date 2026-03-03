@@ -110,10 +110,21 @@ const UserSchema = new Schema<TUser, UserModel>(
         default: 'active',
       },
     },
-   
-    soketId: {
-      type: String,
-    },
+
+ location: {
+  type: {
+    type: String,
+    enum: ['Point'],
+    default: 'Point'
+  },
+  coordinates: {
+    type: [Number], // ✅ শুধু Number array
+    required: true
+  }
+},
+  soketId: {
+    type: String,
+  },
     isActive: {
       type: Boolean,
       default: true,
@@ -148,6 +159,17 @@ UserSchema.pre('save', async function (next) {
   );
   next();
 });
+
+UserSchema.virtual('latitude').get(function () {
+  return this.location.coordinates[1]; // lat
+});
+
+UserSchema.virtual('longitude').get(function () {
+  return this.location.coordinates[0]; // lng
+});
+// Include virtuals in JSON
+UserSchema.set('toJSON', { virtuals: true });
+UserSchema.set('toObject', { virtuals: true });
 
 
 

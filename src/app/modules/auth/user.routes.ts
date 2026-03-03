@@ -27,8 +27,8 @@ router.post('/userVerifyOtp', authControllers.verifyOtpController,);
 router.patch('/change-password',auth(USER_ROLE.DRIVER, USER_ROLE.USER),upload.none(),authControllers.changePassword,);
 router.patch('/reset-password', authControllers.resetPassword);
 router.patch('/status', auth(USER_ROLE.DRIVER, USER_ROLE.USER), authControllers.changeMyStatus);
-
-
+// ✅ Update location with JWT auth
+router.patch('/location', auth(USER_ROLE.DRIVER, USER_ROLE.USER), authControllers.MyLocation);
 
 
 //forget password এর জন্য OTP পাঠানোর route

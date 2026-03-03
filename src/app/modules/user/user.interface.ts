@@ -24,6 +24,11 @@ interface image {
   id: string | number;
   url: string;
 }
+export interface ILocation {
+  type: "Point";
+  coordinates: [longitude: number, latitude: number]; // [lng, lat]
+}
+
 export interface TUser {
   [x: string]: any;
   id?: string;
@@ -44,6 +49,7 @@ export interface TUser {
   verification: Verification;
   accountType?: 'emailvarifi' | 'google' | 'facebook' | 'linkedin' | 'apple';
   countryCode: string;
+  location: ILocation;
   fcmToken?: string;
   soketId?: string;
 }
