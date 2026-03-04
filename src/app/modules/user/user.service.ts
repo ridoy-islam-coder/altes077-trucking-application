@@ -19,13 +19,23 @@ const getme = async (id: string) => {
   }
 
   return {
+    id: result._id,
     email: result.email,
     fullName: result.fullName,
-    countryCode: result.countryCode,
+    role:result.role,
     phoneNumber: result.phoneNumber,
-    website: result.website,
-    categore: result.categore,
+    status: result.status,
+    accountType: result.accountType,
+    isVerified: result.isVerified,
+    isDeleted: result.isDeleted,
+    needsPasswordChange: result.needsPasswordChange,
+    location:result.location,
     image: result.image ?? {},
+    createdAt: result.createdAt,
+    updatedAt: result.updatedAt,
+
+
+    
   };
 };
 
