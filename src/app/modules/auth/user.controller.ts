@@ -32,7 +32,7 @@ const userRegistration = catchAsync(async (req: Request, res: Response) => {
     statusCode: httpStatus.CREATED,
     success: true,
     message: `OTP sent to ${email}. Please verify to complete registration`,
-    data: { email }, // শুধু email পাঠাচ্ছি
+    data: { email , otp: result.otp as number}, // শুধু email পাঠাচ্ছি. OTP response এ দিচ্ছি শুধু testing এর জন্য, production এ দিও না
   });
 });
 

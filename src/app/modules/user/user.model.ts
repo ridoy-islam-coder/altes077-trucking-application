@@ -110,7 +110,7 @@ const UserSchema = new Schema<TUser, UserModel>(
         default: 'active',
       },
     },
-
+    //  location:{ "latitude": Number, "longitude": Number },
  location: {
   type: {
     type: String,
@@ -160,16 +160,16 @@ UserSchema.pre('save', async function (next) {
   next();
 });
 
-UserSchema.virtual('latitude').get(function () {
-  return this.location.coordinates[1]; // lat
-});
+// UserSchema.virtual('latitude').get(function () {
+//   return this.location.coordinates[1]; // lat
+// });
 
-UserSchema.virtual('longitude').get(function () {
-  return this.location.coordinates[0]; // lng
-});
-// Include virtuals in JSON
-UserSchema.set('toJSON', { virtuals: true });
-UserSchema.set('toObject', { virtuals: true });
+// UserSchema.virtual('longitude').get(function () {
+//   return this.location.coordinates[0]; // lng
+// });
+// // Include virtuals in JSON
+// UserSchema.set('toJSON', { virtuals: true });
+// UserSchema.set('toObject', { virtuals: true });
 
 
 

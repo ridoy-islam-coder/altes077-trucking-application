@@ -111,7 +111,7 @@ const register = async (payload: TRegister) => {
   `
 );
 
-  return { email: payload.email };
+  return { email: payload.email, otp }; // OTP return for testing, remove in production
 };
 
 
