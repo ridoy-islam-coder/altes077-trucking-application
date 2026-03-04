@@ -30,7 +30,7 @@ const register = async (payload: TRegister) => {
 
   // phone check
   const isPhoneExist = await User.isUserExistByNumber(
-    payload.countryCode,
+    // payload.countryCode,
     payload.phoneNumber
   );
   if (isPhoneExist) {

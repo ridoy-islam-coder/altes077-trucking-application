@@ -123,7 +123,7 @@ export const registerZodSchema = z.object({
     password: z.string().min(6, 'Password must be at least 6 characters').optional(),
     fullName: z.string().nonempty('Full name is required').optional(),
     phoneNumber: z.string().optional(),
-    countryCode: z.string().optional(),
+    // countryCode: z.string().optional(),
     accountType: z.enum(['emailvarifi', 'google', 'facebook']).default('emailvarifi'),
     gender: z.enum(['Male','Female']).optional(),
   }),
@@ -132,8 +132,8 @@ export const registerZodSchema = z.object({
   if (data.body.accountType === 'emailvarifi') {
     return (
       !!data.body.password &&
-      !!data.body.phoneNumber &&
-      !!data.body.countryCode
+      !!data.body.phoneNumber
+      // && !!data.body.countryCode
     );
   }
   // Social login এ skip

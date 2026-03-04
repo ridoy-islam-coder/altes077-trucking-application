@@ -57,12 +57,12 @@ const UserSchema = new Schema<TUser, UserModel>(
        },
       select: false,
     },
-    countryCode: {
-      type: String,
-      // required: function(this: TUser) { return this.isVerified === true; },
-      sparse: true, // 🔥 important
+    // countryCode: {
+    //   type: String,
+    //   // required: function(this: TUser) { return this.isVerified === true; },
+    //   sparse: true, // 🔥 important
       
-    },
+    // },
 
     phoneNumber: {
       type: String,

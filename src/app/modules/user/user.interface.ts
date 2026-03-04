@@ -48,7 +48,7 @@ export interface TUser {
   isDeleted: boolean;
   verification: Verification;
   accountType?: 'emailvarifi' | 'google' | 'facebook' | 'linkedin' | 'apple';
-  countryCode: string;
+  // countryCode: string;
   location: ILocation;
   fcmToken?: string;
   soketId?: string;
@@ -56,7 +56,8 @@ export interface TUser {
 
 export interface UserModel extends Model<TUser> {
   isUserExist(email: string): Promise<TUser>;
-  isUserExistByNumber(countryCode: string, phoneNumber: string): Promise<TUser>;
+                      //countryCode: string,
+  isUserExistByNumber( phoneNumber: string): Promise<TUser>;
   IsUserExistbyId(id: string): Promise<TUser>;
   isPasswordMatched(
     plainTextPassword: string,
