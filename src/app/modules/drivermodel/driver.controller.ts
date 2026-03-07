@@ -26,11 +26,10 @@ export const createDriver = catchAsync(async (req: Request, res: Response) => {
   
   const driver = await driverServices.driverCreateService(userId, {
     vehicleType,
-    vehicleNumber,
     vehicleCapacity,
     vehicleColor,
     hourRate,
-    location,
+   
   });
 
   sendResponse(res, {

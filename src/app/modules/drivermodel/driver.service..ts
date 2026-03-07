@@ -17,11 +17,10 @@ import User from "../user/user.model";
 ========================= */
 export const driverCreateService = async (userId: string, data: {
   vehicleType: string;
-  vehicleNumber: string;
   vehicleCapacity: string;
   vehicleColor: string;
   hourRate: number;
-  location: { coordinates: [number, number] };
+ 
 }) => {
   const existingDriver = await DriverModel.findOne({ userId });
   if (existingDriver) throw new AppError(httpStatus.BAD_REQUEST, 'Driver already exists for this user');
@@ -29,7 +28,6 @@ export const driverCreateService = async (userId: string, data: {
   const driver = await DriverModel.create({
     userId,
     vehicleType: data.vehicleType,
-    vehicleNumber: data.vehicleNumber,
     vehicleCapacity: data.vehicleCapacity,
     vehicleColor: data.vehicleColor,
     hourRate: data.hourRate,
