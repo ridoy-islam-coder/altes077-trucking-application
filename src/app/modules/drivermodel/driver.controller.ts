@@ -321,6 +321,8 @@ export const driverController = {
   getAutoCompleteController,
   getCaptainsInRadiusController,
   createDriver,
+  getUserAndDriverData,
+  getAllDrivers,
   // uploadDriverImage,
   uploadMultipleDriverImages,
   getCoordinatesController,
