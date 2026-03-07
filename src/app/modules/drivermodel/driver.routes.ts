@@ -13,7 +13,7 @@ router.post( "/upload-image", auth('DRIVER'),upload.array('images', 4),driverCon
 // শুধু authenticated user access করতে পারবে
 router.get("/all",  getAllDrivers);
 // Authenticated user token লাগবে
-router.get("/getme", auth(), getUserAndDriverData);
+router.get("/getme", auth('DRIVER'), getUserAndDriverData);
 
 
 
