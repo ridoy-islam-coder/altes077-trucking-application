@@ -78,6 +78,23 @@ export const uploadMultipleDriverImages = catchAsync(
 
 
 
+export const getAllDrivers = catchAsync(async (req: Request, res: Response) => {
+  // সব driver data fetch + related user data
+  const drivers = await DriverModel.find()
+    .populate({
+      path: "userId",      // Driver model এ যেটা ref করা আছে
+      select: "_id email fullName phoneNumber countryCode role isVerified", // শুধু প্রয়োজনীয় user fields
+    })
+    .lean(); // lean() দিলে lightweight JS objects পাবে
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All drivers with user data fetched successfully",
+    data: drivers,
+  });
+});
+
 
 //  const updateDriverLocationByAddress = catchAsync(async (req, res) => {
 //     const { address } = req.body;

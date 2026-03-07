@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import auth from '../../middleware/auth.middleware';
-import { driverController  } from './driver.controller';
+import { driverController, getAllDrivers  } from './driver.controller';
 import upload from '../../middleware/fileUpload';
 
 
@@ -10,6 +10,8 @@ const router = Router();
 router.post('/createDriver',auth('DRIVER'), driverController.createDriver);
 // multiple files (max 4)
 router.post( "/upload-image", auth('DRIVER'),upload.array('images', 4),driverController.uploadMultipleDriverImages);
+// শুধু authenticated user access করতে পারবে
+router.get("/all", auth('DRIVER'), getAllDrivers);
 
 
 // router.patch('/location/by-address',auth(),driverController.updateDriverLocationByAddress);

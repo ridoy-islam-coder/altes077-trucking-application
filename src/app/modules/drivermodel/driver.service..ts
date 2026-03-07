@@ -6,6 +6,8 @@ import { uploadToS3 } from "../../utils/fileHelper";
 import axios from "axios";
 import config from "../../config";
 import User from "../user/user.model";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 
 
 
@@ -60,6 +62,17 @@ export const driverUploadImageService = async (driverId: string, file: Express.M
 
   return driver;
 };
+
+
+
+
+
+
+
+/**
+ * Save uploaded image info in DB
+ */
+
 
 //  const updateLocationFromAddress = async (
 //   userId: string,
