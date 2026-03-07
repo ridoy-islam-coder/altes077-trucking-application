@@ -18,7 +18,7 @@ import User from "../user/user.model";
 export const driverCreateService = async (userId: string, data: {
   vehicleType: string;
   vehicleCapacity: string;
-  vehicleColor: string;
+  vehicleColor: Number;
   hourRate: number;
  
 }) => {

@@ -62,17 +62,17 @@ const driverSchema = new Schema<IDriver>(
       required: true,
     },
 
-    location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-        default: "Point",
-      },
-      coordinates: {
-        type: [Number],
-        // required: true,
-      },
-    },
+    // location: {
+    //   type: {
+    //     type: String,
+    //     enum: ["Point"],
+    //     default: "Point",
+    //   },
+    //   coordinates: {
+    //     type: [Number],
+    //     // required: true,
+    //   },
+    // },
 
     timestamp: {
       type: Date,
@@ -85,7 +85,7 @@ const driverSchema = new Schema<IDriver>(
 /* =========================
    GEO INDEX
 ========================= */
-driverSchema.index({ location: "2dsphere" });
+// driverSchema.index({ location: "2dsphere" });
 
 /* =========================
    Array Validation Function
