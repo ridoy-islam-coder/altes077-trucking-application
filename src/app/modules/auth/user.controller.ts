@@ -47,7 +47,7 @@ const verifyEmailController = catchAsync(async (req: Request, res: Response) => 
 
   // verifyOtp service → OTP check + DB save
   const user = await authServices.verifyEmail(email, Number(otp));
-
+ const accessToken = jwt.sign({ id: user._id, role: user.role }, config.jwt.jwt_access_secret as string, { expiresIn: '24h' });
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -60,6 +60,7 @@ const verifyEmailController = catchAsync(async (req: Request, res: Response) => 
       countryCode: user.countryCode,
       role: user.role,
       isVerified: user.isVerified,
+      accessToken,
     },
   });
 });
