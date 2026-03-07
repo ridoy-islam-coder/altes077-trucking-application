@@ -53,7 +53,7 @@ const driverSchema = new Schema<IDriver>(
     },
 
     vehicleColor: {
-      type: String,
+      type: Number,
       required: true,
     },
 
@@ -70,7 +70,7 @@ const driverSchema = new Schema<IDriver>(
       },
       coordinates: {
         type: [Number],
-        required: true,
+        // required: true,
       },
     },
 

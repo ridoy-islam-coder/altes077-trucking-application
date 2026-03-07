@@ -18,9 +18,9 @@ export const createDriver = catchAsync(async (req: Request, res: Response) => {
 
   const userId = req.user.id;
 
-  const { vehicleType, vehicleNumber, vehicleCapacity, vehicleColor, hourRate, location } = req.body;
+  const { vehicleType,  vehicleCapacity, vehicleColor, hourRate } = req.body;
 
-  if (!vehicleType || !vehicleNumber || !vehicleCapacity || !vehicleColor || !hourRate || !location?.coordinates) {
+  if (!vehicleType || !vehicleCapacity || !vehicleColor || !hourRate) {
     throw new AppError(httpStatus.BAD_REQUEST, 'All driver fields are required');
   }
   

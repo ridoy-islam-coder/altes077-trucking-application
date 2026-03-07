@@ -26,7 +26,7 @@ export interface IDriver extends Document {
 
   vehicleType: string;
   vehicleCapacity: string;
-  vehicleColor: string;
+  vehicleColor: Number;
   hourRate: number;
   location: ILocation;
   timestamp: Date;

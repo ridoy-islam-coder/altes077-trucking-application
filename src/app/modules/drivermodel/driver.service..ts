@@ -31,7 +31,7 @@ export const driverCreateService = async (userId: string, data: {
     vehicleCapacity: data.vehicleCapacity,
     vehicleColor: data.vehicleColor,
     hourRate: data.hourRate,
-    location: { type: 'Point', coordinates: data.location.coordinates },
+    // location: { type: 'Point', coordinates: data.location.coordinates },
     status: 'inactive',
     images: [], // initially empty
   });
