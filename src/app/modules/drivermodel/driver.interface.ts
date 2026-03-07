@@ -24,17 +24,7 @@ export interface IDriver extends Document {
 
   status: "active" | "inactive";
 
-  vehicleType:
-    | "Truck"
-    | "Van"
-    | "Trailer"
-    | "Flatbed"
-    | "Refrigerated"
-    | "Tanker"
-    | "Container"
-    | "Other";
-
-  vehicleNumber: string;
+  vehicleType: string;
   vehicleCapacity: string;
   vehicleColor: string;
 

@@ -39,22 +39,13 @@ const driverSchema = new Schema<IDriver>(
     vehicleType: {
       type: String,
       required: true,
-      enum: [
-        "Truck",
-        "Van",
-        "Trailer",
-        "Flatbed",
-        "Refrigerated",
-        "Tanker",
-        "Container",
-        "Other",
-      ],
+   
     },
 
-    vehicleNumber: {
-      type: String,
-      required: true,
-    },
+    // vehicleNumber: {
+    //   type: String,
+    //   required: true,
+    // },
 
     vehicleCapacity: {
       type: String,
