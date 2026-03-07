@@ -96,6 +96,30 @@ export const getAllDrivers = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+
+
+export const getUserAndDriverData = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.id; // auth middleware থেকে আসা user id
+  if (!userId) throw new Error("User not authenticated");
+
+  // User data
+  const user = await User.findById(userId)
+    .select("_id email fullName phoneNumber countryCode role isVerified")
+    .lean();
+  if (!user) throw new Error("User not found");
+
+  // Driver data linked to this user
+  const driver = await DriverModel.findOne({ userId })
+    .lean();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User and driver data fetched successfully",
+    data: { user, driver },
+  });
+});
+
 //  const updateDriverLocationByAddress = catchAsync(async (req, res) => {
 //     const { address } = req.body;
 
