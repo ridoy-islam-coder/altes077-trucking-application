@@ -53,7 +53,8 @@ export const driverUploadImageService = async (driverId: string, file: Express.M
 
   if (driver.images.length >= MAX_IMAGES) throw new AppError(httpStatus.BAD_REQUEST, `Cannot upload more than ${MAX_IMAGES} images`);
 
-  const { id, url } = await uploadToS3(file, `driver-${driverId}-${Date.now()}`);
+  // const { id, url } = await uploadToS3(file, `driver-${driverId}-${Date.now()}`);
+  const { id, url } = await uploadToS3(file,`driver-${driverId}-${Date.now()}`);
   driver.images.push({ id, url });
   await driver.save();
 

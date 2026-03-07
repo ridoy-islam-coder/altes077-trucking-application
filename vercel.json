@@ -5,5 +5,13 @@
   ],
   "routes": [
     { "src": "/(.*)", "dest": "src/server.ts" }
-  ]
+  ],
+
+    "functions": {
+    "src/server.ts": {
+      "maxDuration": 30,
+      "memory": 1024,
+      "maxRequestBodySize": 20
+    }
+  }
 }
