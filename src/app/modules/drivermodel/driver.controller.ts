@@ -76,9 +76,7 @@ export const uploadMultipleDriverImages = catchAsync(
   }
 );
 
-
-
-export const getAllDrivers = catchAsync(async (req: Request, res: Response) => {
+ const getAllDrivers = catchAsync(async (req: Request, res: Response) => {
   // সব driver data fetch + related user data
   const drivers = await DriverModel.find()
     .populate({
@@ -98,7 +96,7 @@ export const getAllDrivers = catchAsync(async (req: Request, res: Response) => {
 
 
 
-export const getUserAndDriverData = catchAsync(async (req: Request, res: Response) => {
+ const getUserAndDriverData = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user?.id; // auth middleware থেকে আসা user id
   if (!userId) throw new Error("User not authenticated");
 
@@ -187,13 +185,47 @@ const getCoordinatesController = async (
 
 
 
+// /* ===== Distance & Time ===== */
+//  const getDistanceTimeController = async (
+//   req: Request,
+//   res: Response
+// ) => {
+//   try {
+//     const { origin, destination } = req.query;
+
+//     const result = await driverServices.getDistanceTime(
+//       origin as string,
+//       destination as string
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       data: result,
+//     });
+//   } catch (error: any) {
+//     res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+
+
+
 /* ===== Distance & Time ===== */
- const getDistanceTimeController = async (
+const getDistanceTimeController = async (
   req: Request,
   res: Response
 ) => {
   try {
     const { origin, destination } = req.query;
+
+    if (!origin || !destination) {
+      return res.status(400).json({
+        success: false,
+        message: "Origin and destination are required",
+      });
+    }
 
     const result = await driverServices.getDistanceTime(
       origin as string,
@@ -204,35 +236,73 @@ const getCoordinatesController = async (
       success: true,
       data: result,
     });
+
   } catch (error: any) {
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
 
-/* ===== Auto Complete ===== */
- const getAutoCompleteController = async (
+
+const getAutoCompleteController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const { input } = req.query;
+    const { input, lat, lng } = req.query;
 
-    const suggestions = await driverServices.getAutoCompleteSuggestions(input as string);
+    const suggestions = await driverServices.getAutoCompleteSuggestions(
+      input as string,
+      lat as string,
+      lng as string
+    );
 
     res.status(200).json({
       success: true,
       data: suggestions,
     });
+
   } catch (error: any) {
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
+
+
+
+
+
+
+
+// /* ===== Auto Complete ===== */
+//  const getAutoCompleteController = async (
+//   req: Request,
+//   res: Response
+// ) => {
+//   try {
+//     const { input } = req.query;
+
+//     const suggestions = await driverServices.getAutoCompleteSuggestions(input as string);
+
+//     res.status(200).json({
+//       success: true,
+//       data: suggestions,
+//     });
+//   } catch (error: any) {
+//     res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
 
 /* ===== Captains in Radius ===== */
  const getCaptainsInRadiusController = async (

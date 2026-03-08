@@ -160,67 +160,116 @@ interface Coordinates {
 
 
 
-export interface DistanceTimeResult {
-  distance: {
-    text: string;
-    value: number;
-  };
-  duration: {
-    text: string;
-    value: number;
-  };
-  status: string;
-}
+// export interface DistanceTimeResult {
+//   distance: {
+//     text: string;
+//     value: number;
+//   };
+//   duration: {
+//     text: string;
+//     value: number;
+//   };
+//   status: string;
+// }
 
- const getDistanceTime = async (
+//  const getDistanceTime = async (
+//   origin: string,
+//   destination: string
+// ): Promise<DistanceTimeResult> => {
+//   if (!origin || !destination) {
+//     throw new Error("Origin and destination are required");
+//   }
+
+//   const apiKey =GOOGLE_MAPS_API;
+//   if (!apiKey) {
+//     throw new Error("Google Maps API key not found");
+//   }
+
+//   const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(
+//     origin
+//   )}&destinations=${encodeURIComponent(destination)}&key=${apiKey}`;
+
+//   const response = await axios.get(url);
+
+//   if (response.data.status !== "OK") {
+//     throw new Error("Unable to fetch distance and time");
+//   }
+
+//   const element = response.data.rows[0].elements[0];
+
+//   if (element.status === "ZERO_RESULTS") {
+//     throw new Error("No routes found");
+//   }
+
+//   return element;
+// };
+
+
+const getDistanceTime = async (
   origin: string,
   destination: string
-): Promise<DistanceTimeResult> => {
-  if (!origin || !destination) {
-    throw new Error("Origin and destination are required");
-  }
+): Promise<any> => {
 
-  const apiKey =GOOGLE_MAPS_API;
+  const apiKey = GOOGLE_MAPS_API;
+
   if (!apiKey) {
     throw new Error("Google Maps API key not found");
   }
 
-  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(
-    origin
-  )}&destinations=${encodeURIComponent(destination)}&key=${apiKey}`;
+  const url = `https://maps.googleapis.com/maps/api/distancematrix/json`;
 
-  const response = await axios.get(url);
+  const response = await axios.get(url, {
+    params: {
+      origins: origin,          // example: "23.81,90.41"
+      destinations: destination, // example: "23.70,90.37"
+      key: apiKey,
+    },
+  });
 
-  if (response.data.status !== "OK") {
-    throw new Error("Unable to fetch distance and time");
+  const data = response.data;
+
+  if (data.status !== "OK") {
+    throw new Error("Google API error");
   }
 
-  const element = response.data.rows[0].elements[0];
+  const element = data.rows[0].elements[0];
 
-  if (element.status === "ZERO_RESULTS") {
-    throw new Error("No routes found");
+  if (element.status !== "OK") {
+    throw new Error("No route found");
   }
 
-  return element;
+  return {
+    distanceText: element.distance.text,
+    distanceValue: element.distance.value,
+    durationText: element.duration.text,
+    durationValue: element.duration.value,
+  };
 };
 
-/* ================= Auto Complete ================= */
+
 
 export const getAutoCompleteSuggestions = async (
-  input: string
+  input: string,
+  lat?: string,
+  lng?: string
 ): Promise<string[]> => {
+
   if (!input) {
     throw new Error("Query is required");
   }
 
   const apiKey = GOOGLE_MAPS_API;
+
   if (!apiKey) {
     throw new Error("Google Maps API key not found");
   }
 
-  const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
-    input
-  )}&key=${apiKey}`;
+  let url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${apiKey}`;
+
+  // optional location bias
+  if (lat && lng) {
+    url += `&location=${lat},${lng}&radius=50000`;
+  }
 
   const response = await axios.get(url);
 
@@ -232,6 +281,38 @@ export const getAutoCompleteSuggestions = async (
     .map((prediction: any) => prediction.description)
     .filter(Boolean);
 };
+
+
+
+
+// /* ================= Auto Complete ================= */
+
+// export const getAutoCompleteSuggestions = async (
+//   input: string
+// ): Promise<string[]> => {
+//   if (!input) {
+//     throw new Error("Query is required");
+//   }
+
+//   const apiKey = GOOGLE_MAPS_API;
+//   if (!apiKey) {
+//     throw new Error("Google Maps API key not found");
+//   }
+
+//   const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+//     input
+//   )}&key=${apiKey}`;
+
+//   const response = await axios.get(url);
+
+//   if (response.data.status !== "OK") {
+//     throw new Error("Unable to fetch suggestions");
+//   }
+
+//   return response.data.predictions
+//     .map((prediction: any) => prediction.description)
+//     .filter(Boolean);
+// };
 
 /* ================= Captains In Radius ================= */
 // export const getCaptainsInTheRadius = async (

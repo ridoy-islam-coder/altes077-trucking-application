@@ -160,6 +160,11 @@ UserSchema.pre('save', async function (next) {
   next();
 });
 
+
+// GEO index for nearby driver search
+UserSchema.index({ location: "2dsphere" });
+
+
 // UserSchema.virtual('latitude').get(function () {
 //   return this.location.coordinates[1]; // lat
 // });
