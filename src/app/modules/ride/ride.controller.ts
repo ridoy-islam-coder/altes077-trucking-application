@@ -6,6 +6,7 @@ import { DriverModel } from "../drivermodel/dirver.model";
 import User from "../user/user.model";
 import { RideModel } from "./ride.model";
 import { rideServices } from "./ride.service";
+import { io } from "../../../server";
 
 
 // export const createRideController = catchAsync(async (req, res) => {
@@ -600,7 +601,8 @@ export const acceptRideController = catchAsync(async (req , res) => {
   // ✅ call SERVICE (not controller)
   const result = await rideServices.acceptRide(
     rideId,
-    driverId
+    driverId,
+     io 
   );
 
   sendResponse(res, {

@@ -4,6 +4,9 @@ import { IRide } from './ride.interface';
 import User from "../user/user.model";
 import axios from "axios";
 import mongoose, { Types } from "mongoose";
+import { saveNotification } from "../notification/saveNotification";
+import { io } from '../../../server'; // server.ts থেকে export করা io
+import { Server } from 'socket.io';
 // import { io } from "../../server";
 
 /* =========================
@@ -126,7 +129,8 @@ export const createRide = async (
 
 export const acceptRide = async (
   rideId: string,
-  driverId: string
+  driverId: string,
+  io: Server  // 🔹 add io parameter
 ) => {
 
   const ride = await RideModel.findById(rideId);
@@ -144,11 +148,18 @@ export const acceptRide = async (
 
   await ride.save();
 
-  // ✅ notify user (socket optional)
-  // io.to(ride.userId.toString()).emit("ride-accepted", {
-  //   rideId: ride._id,
-  //   driverId,
-  // });
+
+
+
+   // Notification to user
+await saveNotification({
+    io,
+    userId: ride.userId.toString(),
+    role: 'USER', // ✅ এখানে role ব্যবহার করতে হবে
+    title: 'Ride Accepted',
+    message: 'Your ride has been accepted by the driver',
+    type: 'custom',
+});
 
   return ride;
 };
@@ -156,7 +167,16 @@ export const acceptRide = async (
 
 
 
-
+  // // ✅ Notify user
+  // const user = await User.findById(ride.userId);
+  // if (user?.socketId) {
+  //   // ১. Live notification via Socket.IO
+  //   io.to(user.socketId).emit('ride-accepted', {
+  //     rideId: ride._id,
+  //     driverId,
+  //     message: 'Your ride has been accepted by the driver',
+  //   });
+  // }
 
 export const rejectRide = async (
   rideId: string,
@@ -190,6 +210,15 @@ export const rejectRide = async (
   //   rideId: ride._id,
   //   driverId,
   // });
+await saveNotification({
+    io,
+    userId: ride.userId.toString(),
+    role: 'USER', // ✅ এখানে role ব্যবহার করতে হবে
+    title: 'Ride Accepted',
+    message: 'Your ride has been accepted by the driver',
+    type: 'custom',
+});
+
 
   return ride;
 };
