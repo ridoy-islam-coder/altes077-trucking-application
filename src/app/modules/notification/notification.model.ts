@@ -11,7 +11,7 @@ const notificationSchema = new Schema(
     message: { type: String, required: true },
     type: {
       type: String,
-      enum: ['welcome', 'profile', 'payment', 'admin', 'custom'],
+      enum: ['welcome', 'profile', 'admin', 'custom'],
       default: 'custom',
     },
     isRead: { type: Boolean, default: false },

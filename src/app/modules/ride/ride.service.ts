@@ -145,10 +145,10 @@ export const acceptRide = async (
   await ride.save();
 
   // ✅ notify user (socket optional)
-  io.to(ride.userId.toString()).emit("ride-accepted", {
-    rideId: ride._id,
-    driverId,
-  });
+  // io.to(ride.userId.toString()).emit("ride-accepted", {
+  //   rideId: ride._id,
+  //   driverId,
+  // });
 
   return ride;
 };
@@ -186,10 +186,10 @@ export const rejectRide = async (
   await ride.save();
 
   // ✅ notify user (optional)
-  io.to(ride.userId.toString()).emit("driver-rejected", {
-    rideId: ride._id,
-    driverId,
-  });
+  // io.to(ride.userId.toString()).emit("driver-rejected", {
+  //   rideId: ride._id,
+  //   driverId,
+  // });
 
   return ride;
 };

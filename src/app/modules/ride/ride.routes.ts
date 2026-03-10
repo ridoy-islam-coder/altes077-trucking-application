@@ -67,7 +67,7 @@ Future Ride APIs
 Driver APIs
 ========================= */
 router.patch("/status/:id/accept", auth(USER_ROLE.DRIVER), ridecontroller.acceptRideController);
-router.patch("/status/:id/start", auth(USER_ROLE.DRIVER), ridecontroller.startRideController);
+// router.patch("/status/:id/start", auth(USER_ROLE.DRIVER), ridecontroller.startRideController);
 router.patch("/status/:id/complete", auth(USER_ROLE.DRIVER), ridecontroller.completeRideController);
 
 
