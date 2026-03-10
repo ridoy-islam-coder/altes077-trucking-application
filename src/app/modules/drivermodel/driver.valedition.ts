@@ -16,13 +16,14 @@ export const locationSchema = z.object({
 export const driverCreateSchema = z.object({
   vehicleType: z.enum([
     'Truck',
+    'Truck',
     'Van',
     'Trailer',
     'Flatbed',
     'Refrigerated',
     'Tanker',
     'Container',
-    'Other',
+    'Other'
   ]),
   vehicleNumber: z.string().min(1, 'Vehicle number is required'),
   vehicleCapacity: z.string().min(1, 'Vehicle capacity is required'),

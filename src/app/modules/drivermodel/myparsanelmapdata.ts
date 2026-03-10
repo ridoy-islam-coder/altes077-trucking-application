@@ -7,7 +7,6 @@ import { DriverCreateBasicInput } from "./driver.valedition";
 import AppError from "../../error/AppError";
 import { DriverModel } from "./dirver.model";
 import User from "../user/user.model";
-import { RideModel } from "../ride/ride.model";
 
 
 
@@ -170,52 +169,20 @@ export const getCaptainsInRadiusController = async (req: Request, res: Response)
 
 
 
-
-
-
-
-
-
-export const getcalcutorfar = async (
+/* ===== Auto Complete ===== */
+ const getAutoCompleteController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const { ltd, lng, radius, type } = req.query;
-  // ✅ token থেকে userId
-    if (!req.user?.id) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
-    // ✅ userId from token
-     const userId = req.user.id;
+    const { input } = req.query;
 
-    if (!ltd || !lng || !radius) {
-      return res.status(400).json({
-        success: false,
-        message: "Latitude, longitude, and radius are required",
-      });
-    }
-
-    if (!type) {
-      return res.status(400).json({
-        success: false,
-        message: "Driver type is required",
-      });
-    }
-
-    const result = await driverServices.getcalcutorprice(
-      Number(ltd),
-      Number(lng),
-      Number(radius),
-      type as string,
-      userId // ✅ pass token user
-    );
+    const suggestions = await driverServices.getAutoCompleteSuggestions(input as string);
 
     res.status(200).json({
       success: true,
-      data: result,
+      data: suggestions,
     });
-
   } catch (error: any) {
     res.status(500).json({
       success: false,
@@ -232,11 +199,30 @@ export const getcalcutorfar = async (
 
 
 
+//  const updateDriverLocationByAddress = catchAsync(async (req, res) => {
+//     const { address } = req.body;
 
+//     if (!address) {
+//       throw new AppError(400, 'Address is required');
+//     }
 
+//     const result =
+//       await driverServices.updateLocationFromAddress(
+//         req.user.id,
+//         address,
+//       );
 
+//     sendResponse(res, {
+//       statusCode: 200,
+//       success: true,
+//       message: 'Location updated successfully',
+//       data: result,
+//     });
+//   },
+// );
 
 
+// AIzaSyCB3G-ob1C6JEUF_wotuQY1RMPKIbRkPIw
 
 
 
@@ -247,139 +233,46 @@ export const getcalcutorfar = async (
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export const getAutoSuggestions = async (
-  req: Request,
-  res: Response,
-
-) => {
-  try {
-    const { lat, lng } = req.query;
-
-    if (!lat || !lng) throw new AppError(httpStatus.BAD_REQUEST, "Latitude and longitude are required");
-
-    const suggestions = await driverServices.getSuggestions(
-      lat as string,
-      lng as string
-    );
-
-    res.status(200).json({
-      success: true,
-      data: suggestions,
-    });
-
-  } catch (error: any) {
-     res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-const getAutoCompleteController = async (
+const getCoordinatesController = async (
   req: Request,
   res: Response
-) => {
+): Promise<void> => {
   try {
-    const { input, lat, lng } = req.query;
+    const { address } = req.query;
 
-    const suggestions = await driverServices.getAutoCompleteSuggestions(
-      input as string,
-      lat as string,
-      lng as string
-    );
+    if (!address || typeof address !== "string") {
+      res.status(400).json({
+        success: false,
+        message: "Address is required",
+      });
+      return;
+    }
+
+    const coordinates = await driverServices.getAddressCoordinate(address);
 
     res.status(200).json({
       success: true,
-      data: suggestions,
+      data: coordinates,
     });
-
   } catch (error: any) {
-
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Internal Server Error",
     });
-
   }
 };
-
-
-
 
 
 
 
 
 // /* ===== Distance & Time ===== */
-// const getDistanceTimeController = async (
+//  const getDistanceTimeController = async (
 //   req: Request,
 //   res: Response
 // ) => {
 //   try {
 //     const { origin, destination } = req.query;
-
-//     if (!origin || !destination) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Origin and destination are required",
-//       });
-//     }
 
 //     const result = await driverServices.getDistanceTime(
 //       origin as string,
@@ -389,6 +282,69 @@ const getAutoCompleteController = async (
 //     res.status(200).json({
 //       success: true,
 //       data: result,
+//     });
+//   } catch (error: any) {
+//     res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+
+
+
+/* ===== Distance & Time ===== */
+const getDistanceTimeController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { origin, destination } = req.query;
+
+    if (!origin || !destination) {
+      return res.status(400).json({
+        success: false,
+        message: "Origin and destination are required",
+      });
+    }
+
+    const result = await driverServices.getDistanceTime(
+      origin as string,
+      destination as string
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+
+  } catch (error: any) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
+
+// const getAutoCompleteController = async (
+//   req: Request,
+//   res: Response
+// ) => {
+//   try {
+//     const { input, lat, lng } = req.query;
+
+//     const suggestions = await driverServices.getAutoCompleteSuggestions(
+//       input as string,
+//       lat as string,
+//       lng as string
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       data: suggestions,
 //     });
 
 //   } catch (error: any) {
@@ -402,74 +358,13 @@ const getAutoCompleteController = async (
 // };
 
 
-const getDistanceTimeController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    // ✅ query থেকে নিচ্ছি
-    const { origin, destination } = req.query;
-
-    // ✅ token থেকে userId
-    const userId = req.user.id;
-
-    if (!origin || !destination) {
-      return res.status(400).json({
-        success: false,
-        message: "Origin and destination required",
-      });
-    }
-
-    // distance api call
-    const result = await driverServices.getDistanceTime(
-      origin as string,
-      destination as string
-    );
-
-    // coordinates split
-    const [pickupLat, pickupLng] = (origin as string).split(",");
-    const [dropLat, dropLng] = (destination as string).split(",");
-
-    // ✅ Ride create
-    const ride = await RideModel.create({
-      userId,
-
-      pickupLocation: {
-        lat: Number(pickupLat),
-        lng: Number(pickupLng),
-        address: "Pickup Location",
-      },
-
-      dropLocation: {
-        lat: Number(dropLat),
-        lng: Number(dropLng),
-        address: "Drop Location",
-      },
-
-      distance: result.distanceValue,
-      duration: result.durationValue,
-      distanceText: result.distanceText,
-      durationText: result.durationText,
-   
-
-      // example fare calculation
-      fare: Math.round((result.distanceValue / 1000) * 20),
-    });
-
-    res.status(200).json({
-      success: true,
-      data: ride,
-    });
-
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
 
 
+
+
+
+
+/* ===== Captains in Radius ===== */
 
 
 
@@ -566,20 +461,18 @@ export const getExactStreetAddressController = async (req: Request, res: Respons
 
 
 export const driverController = {
- 
+  getDistanceTimeController,
   getAutoCompleteController,
   getCaptainsInRadiusController,
   createDriver,
   getUserAndDriverData,
   getAllDrivers,
-  getDistanceTimeController,
-  getAutoSuggestions,
   // uploadDriverImage,
   getDriversByVehicleTypeController,
   uploadMultipleDriverImages,
-   getAddressFromCoordinatesController,
+  getCoordinatesController,
+  getAddressFromCoordinatesController,
   getExactStreetAddressController,
-  getcalcutorfar,
 };
 
 

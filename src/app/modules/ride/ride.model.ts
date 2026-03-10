@@ -84,6 +84,7 @@
 
 import { Schema, model } from "mongoose";
 import { IRide } from "./ride.interface";
+import { string } from "zod";
 
 const locationSchema = new Schema(
   {
@@ -137,12 +138,18 @@ const rideSchema = new Schema<IRide>(
       type: Number,
       required: true,
     },
-
+      distanceText: {type: String, },
+      durationText: {type: String, }, 
     fare: {
       type: Number,
       required: true,
     },
-
+    pickupTime: {
+      type: String,
+    },
+    pickupDate: {
+      type: String,
+    }, 
     status: {
       type: String,
       enum: [
@@ -160,9 +167,13 @@ const rideSchema = new Schema<IRide>(
       min: 1,
       max: 5,
     },
-    driverReview: {
+    userNotes: {
       type: String,
       maxlength: 200,
+    },
+      driverReview: {
+      type: String,
+      maxlength: 500,
     },
   },
   {

@@ -17,17 +17,22 @@ router.get("/all",  driverController.getAllDrivers);
 router.get("/getme", auth('DRIVER'),driverController.getUserAndDriverData);
 router.get("/distance-time",auth( USER_ROLE.USER), driverController.getDistanceTimeController);
 router.get("/autocomplete", driverController.getAutoCompleteController);
-
-// router.patch('/location/by-address',auth(),driverController.updateDriverLocationByAddress);
-
-router.get("/coordinates", driverController.getCoordinatesController);
-
-
+router.get("/suggestions", driverController.getAutoSuggestions);
 router.get("/captains-radius", driverController.getCaptainsInRadiusController);
+// router.patch('/location/by-address',auth(),driverController.updateDriverLocationByAddress);
+// ✅ Route
+router.get("/create-rides", auth(USER_ROLE.USER),driverController.getcalcutorfar  );
+
+
+
+// POST /api/maps/exact-address  lat এবং lng দিয়ে ঠিকানা পেতে
 router.post("/reverse-geocode", driverController.getAddressFromCoordinatesController);
 
-// POST /api/maps/exact-address
+// POST /api/maps/exact-address  lat এবং lng দিয়ে ঠিকানা পেতে
 router.post("/exact-address", driverController.getExactStreetAddressController);
+// GET /api/maps/vehicle-types?type=Truck
+router.get("/vehicletypes",auth( USER_ROLE.USER), driverController.getDriversByVehicleTypeController);
+
 
 
 export const driverRoutes = router;

@@ -13,7 +13,7 @@ Create Ride
 ========================= */
 router.post('/create-ride', auth(USER_ROLE.USER), ridecontroller.createRideController,);
 
-
+router.patch("/add-timedate",auth(USER_ROLE.USER),ridecontroller.addPickupScheduleController);
 /* =========================
 Get Ride by ID
 GET /rides/:id

@@ -7,64 +7,68 @@ import User from "../user/user.model";
 import { RideModel } from "./ride.model";
 import { rideServices } from "./ride.service";
 
-export const createRideController = catchAsync(async (req, res) => {
-  const { pickupLocation, dropLocation, driverId } = req.body;
+// export const createRideController = catchAsync(async (req, res) => {
+//   const { pickupLocation, dropLocation, driverId } = req.body;
 
-  if (!pickupLocation || !dropLocation || !driverId) {
-    return sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "Pickup, drop location and driverId are required",
-      data: null,
-    });
-  }
+//   if (!pickupLocation || !dropLocation || !driverId) {
+//     return sendResponse(res, {
+//       statusCode: 400,
+//       success: false,
+//       message: "Pickup, drop location and driverId are required",
+//       data: null,
+//     });
+//   }
 
-  // Step 1: Find the driver
-  const driver = await DriverModel.findById(driverId);
-  if (!driver) {
-    return sendResponse(res, {
-      statusCode: 404,
-      success: false,
-      message: "Driver not found",
-      data: null,
-    });
-  }
 
-  // Step 2: Get distance & duration from Google API
-  const origin = `${pickupLocation.lat},${pickupLocation.lng}`;
-  const destination = `${dropLocation.lat},${dropLocation.lng}`;
-  const result = await rideServices.getDistanceTime(origin, destination);
+  
 
-  const durationHours = result.durationValue / 3600; // seconds -> hours
 
-  // Step 3: Calculate fare using driver's hourRate
-  const fare = durationHours * driver.hourRate;
+//   // Step 1: Find the driver
+//   const driver = await DriverModel.findById(driverId);
+//   if (!driver) {
+//     return sendResponse(res, {
+//       statusCode: 404,
+//       success: false,
+//       message: "Driver not found",
+//       data: null,
+//     });
+//   }
 
-  // Check for NaN
-  if (isNaN(fare)) {
-    console.error({ durationHours, hourRate: driver.hourRate, driver });
-    throw new Error("Fare calculation failed");
-  }
+//   // Step 2: Get distance & duration from Google API
+//   const origin = `${pickupLocation.lat},${pickupLocation.lng}`;
+//   const destination = `${dropLocation.lat},${dropLocation.lng}`;
+//   const result = await rideServices.getDistanceTime(origin, destination);
 
-  // Step 4: Save ride to DB
-  const ride = await RideModel.create({
-    userId: req.user.id,
-    driverId: driver._id,
-    pickupLocation,
-    dropLocation,
-    distance: result.distanceValue,
-    duration: result.durationValue,
-    fare,
-    status: "pending",
-  });
+//   const durationHours = result.durationValue / 3600; // seconds -> hours
 
-  sendResponse(res, {
-    statusCode: 201,
-    success: true,
-    message: "Ride created successfully",
-    data: ride,
-  });
-});
+//   // Step 3: Calculate fare using driver's hourRate
+//   const fare = durationHours * driver.hourRate;
+
+//   // Check for NaN
+//   if (isNaN(fare)) {
+//     console.error({ durationHours, hourRate: driver.hourRate, driver });
+//     throw new Error("Fare calculation failed");
+//   }
+
+//   // Step 4: Save ride to DB
+//   const ride = await RideModel.create({
+//     userId: req.user.id,
+//     driverId: driver._id,
+//     pickupLocation,
+//     dropLocation,
+//     distance: result.distanceValue,
+//     duration: result.durationValue,
+//     fare,
+//     status: "pending",
+//   });
+
+//   sendResponse(res, {
+//     statusCode: 201,
+//     success: true,
+//     message: "Ride created successfully",
+//     data: ride,
+//   });
+// });
 
 
 
@@ -141,41 +145,41 @@ export const createRideController = catchAsync(async (req, res) => {
 
 
 
-// export const createRideController = catchAsync(
-//   async (req, res) => {
+export const createRideController = catchAsync(
+  async (req, res) => {
 
-//     const userId = req.user.id;
-//     const { driverId, pickupLocation, dropLocation, distance, duration } = req.body;
+    const userId = req.user.id;
+    const { pickupLocation, dropLocation, distance, duration, driverId } = req.body;
 
-//     if (!driverId || !pickupLocation || !dropLocation || !distance || !duration) {
-//       return sendResponse(res, {
-//         statusCode: 400,
-//         success: false,
-//         message: "All fields are required",
-//         data: null,
-//       });
-//     }
+    if (!pickupLocation || !dropLocation || !distance || !duration || !driverId) {
+      return sendResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "All fields including driverId are required",
+        data: null,
+      });
+    }
 
    
 
-//     const ride = await rideServices.createRide({
-//       userId,
-//       driverId,
-//       pickupLocation,
-//       dropLocation,
-//       distance,
-//       duration,
-//     });
-//     console.log("🚀 ~ file: ride.controller.ts:63 ~ createRideController ~ ride:", ride);
+    const ride = await rideServices.createRide({
+      userId,
+      pickupLocation,
+      dropLocation,
+      distance,
+      duration,
+      driverId,
+    });
+    console.log("🚀 ~ file: ride.controller.ts:63 ~ createRideController ~ ride:", ride);
 
-//     sendResponse(res, {
-//       statusCode: 201,
-//       success: true,
-//       message: "Ride created successfully",
-//       data: ride,
-//     });
-//   }
-// );
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: "Ride created successfully",
+      data: ride,
+    });
+  }
+);
 
 
 export const getRideByIdController = catchAsync(async (req, res) => {
@@ -198,6 +202,56 @@ export const getRideByIdController = catchAsync(async (req, res) => {
     data: ride,
   });
 });
+
+
+
+
+
+
+export const addPickupScheduleController = catchAsync(
+  async (req, res) => {
+    const userId = req.user.id;
+    const { pickupTime, pickupDate,userNotes } = req.body;
+
+    if (!pickupTime || !pickupDate || !userNotes) {
+      return sendResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "pickupTime, pickupDate, and userNotes are required",
+        data: null,
+      });
+    }
+
+    // ✅ find latest created ride of this user
+    const latestRide = await RideModel.findOne({
+      userId,
+      status: "pending",
+    }).sort({ createdAt: -1 });
+
+    if (!latestRide) {
+      return sendResponse(res, {
+        statusCode: 404,
+        success: false,
+        message: "No pending ride found",
+        data: null,
+      });
+    }
+
+    // ✅ update pickup schedule
+    latestRide.pickupTime = pickupTime;
+    latestRide.pickupDate = pickupDate;
+    latestRide.userNotes = userNotes;
+
+    await latestRide.save();
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Pickup schedule added successfully",
+      data: latestRide,
+    });
+  }
+);
 
 
 export const listRidesController = catchAsync(async (req, res) => {
@@ -532,6 +586,7 @@ export const ridecontroller = {
   completeRideController,
     cancelRideController,
     adjustFareController,
+    addPickupScheduleController,
     rateDriverController,
     nearbyDriversController
 };

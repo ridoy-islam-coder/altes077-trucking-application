@@ -27,10 +27,13 @@ export interface IRide {
   updatedAt?: Date;
   startedAt?: Date;      // এখানে add করা হলো
   completedAt?: Date; 
+  pickupTime: string;
+  pickupDate: string;
+  userNotes?: string; // ✅ Add this field
+distanceText: string; // ✅ Add this field
+durationText: string; // ✅ Add this field
     // ✅ Add these fields
   driverRating: Number,
   driverReview: String,
 
-  // createdAt: { type: Date, default: Date.now },
-  // updatedAt: { type: Date, default: Date.now },   // এখানে add করা হলো
 }

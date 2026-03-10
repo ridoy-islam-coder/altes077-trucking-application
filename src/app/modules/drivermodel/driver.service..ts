@@ -8,6 +8,7 @@ import config from "../../config";
 import User from "../user/user.model";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
+import { RideModel } from "../ride/ride.model";
 
 
 
@@ -156,6 +157,37 @@ interface Coordinates {
 
 
 
+export const getCaptainsInThedriver = async (
+  lat: number,
+  lng: number,
+  radius: number,
+  type: string
+) => {
+  if (!lat || !lng || !radius) throw new Error("Latitude, longitude, and radius are required");
+
+  const query = {
+    status: "active",    // ✅ only active drivers
+    vehicleType: type,          // ✅ only the type provided by user
+    location: {
+      $geoWithin: {
+        $centerSphere: [[lng, lat], radius / 6371], // lng first for GeoJSON
+      },
+    },
+  };
+
+  const captains = await DriverModel.find(query);
+  // ✅ No drivers found message via sendResponse
+  if (captains.length === 0) {
+    return {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "No active drivers found for the given type and location",
+      data: [],
+    };
+  }
+  return captains;
+};
+
 
 
 
@@ -248,8 +280,119 @@ const getDistanceTime = async (
 
 
 
+
+
+
+
+
+
+export const getcalcutorprice = async (
+  lat: number,
+  lng: number,
+  radius: number,
+  type: string,
+  userId: string
+) => {
+
+  const captains = await DriverModel.find({
+    status: "active",
+    vehicleType: type,
+    location: {
+      $geoWithin: {
+        $centerSphere: [[lng, lat], radius / 6371],
+      },
+    },
+  });
+
+  if (captains.length === 0) {
+    return {
+      message: "No active drivers found",
+      data: [],
+    };
+  }
+
+  const driver = captains[0];
+
+  // example duration
+  const hours = 20 / 60;
+
+  const fare = Math.ceil(driver.hourRate * hours);
+
+  // ✅ Ride save using token userId
+  const ride = await RideModel.create({
+    userId,
+    driverId: driver._id,
+
+    pickupLocation: {
+      lat,
+      lng,
+      address: "Pickup Location",
+    },
+
+    dropLocation: {
+      lat,
+      lng,
+      address: "Drop Location",
+    },
+
+    distance: 0,
+    duration: 1200,
+    fare,
+  });
+
+  return {
+    captains,
+    ride,
+  };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const getSuggestions = async (
+  lat: string,
+  lng: string
+): Promise<string[]> => {
+
+  if (!lat || !lng) throw new Error("Latitude and longitude are required");
+
+  const apiKey =GOOGLE_MAPS_API;
+  if (!apiKey) throw new Error("Google Maps API key not found");
+
+  // Using Nearby Search API instead of Autocomplete
+  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&key=${apiKey}`;
+
+  const response = await axios.get(url);
+
+  if (response.data.status !== "OK") {
+    throw new Error(response.data.error_message || "Unable to fetch suggestions");
+  }
+
+  // Map to place names
+  return response.data.results
+    .map((place: any) => place.name)
+    .filter(Boolean);
+};
+
+
+
 export const getAutoCompleteSuggestions = async (
-  input: string,
+   input: string,
   lat?: string,
   lng?: string
 ): Promise<string[]> => {
@@ -333,19 +476,20 @@ export const getAutoCompleteSuggestions = async (
 //   return captains;
 // };
 
-export const getCaptainsInTheRadius = async (lat: number, lng: number, radius: number) => {
-  if (!lat || !lng || !radius) throw new Error("Latitude, longitude and radius are required");
+// export const getCaptainsInTheRadius = async (lat: number, lng: number, radius: number) => {
+//   if (!lat || !lng || !radius) throw new Error("Latitude, longitude and radius are required");
 
-  const captains = await DriverModel.find({
-    location: {
-      $geoWithin: {
-        $centerSphere: [[lng, lat], radius / 6371], // ✅ lng first
-      },
-    },
-  });
+//   const captains = await DriverModel.find({
+//     location: {
+//       $geoWithin: {
+//         $centerSphere: [[lng, lat], radius / 6371], // ✅ lng first
+//       },
+//     },
+//   });
 
-  return captains;
-};
+//   return captains;
+// };
+
 
 
 
@@ -451,7 +595,10 @@ export const driverServices = {
   driverUploadImageService,
   getDistanceTime,
   getAutoCompleteSuggestions,
-  getCaptainsInTheRadius,
+  getSuggestions,
+  // getCaptainsInTheRadius,
+  getCaptainsInThedriver,
   getAddressCoordinate,
   getAddressFromCoordinates,
+  getcalcutorprice,
 };
