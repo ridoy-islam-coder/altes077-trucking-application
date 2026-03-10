@@ -7,6 +7,7 @@ import User from "../user/user.model";
 import { RideModel } from "./ride.model";
 import { rideServices } from "./ride.service";
 
+
 // export const createRideController = catchAsync(async (req, res) => {
 //   const { pickupLocation, dropLocation, driverId } = req.body;
 
@@ -324,75 +325,75 @@ export const updateRideStatusController = catchAsync(async (req, res) => {
 Driver accepts ride
 PATCH /rides/:id/accept
 ========================= */
-export const acceptRideController = catchAsync(async (req, res) => {
-  const ride = await RideModel.findById(req.params.id);
-  if (!ride) {
-    return sendResponse(res, {
-      statusCode: 404,
-      success: false,
-      message: "Ride not found",
-      data: null,
-    });
-  }
+// export const acceptRideController = catchAsync(async (req, res) => {
+//   const ride = await RideModel.findById(req.params.id);
+//   if (!ride) {
+//     return sendResponse(res, {
+//       statusCode: 404,
+//       success: false,
+//       message: "Ride not found",
+//       data: null,
+//     });
+//   }
 
-  if (ride.status !== "pending") {
-    return sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "Ride cannot be accepted",
-      data: null,
-    });
-  }
+//   if (ride.status !== "pending") {
+//     return sendResponse(res, {
+//       statusCode: 400,
+//       success: false,
+//       message: "Ride cannot be accepted",
+//       data: null,
+//     });
+//   }
 
-  ride.status = "accepted";
-  ride.driverId = req.user.id;
-  ride.updatedAt = new Date();
-  await ride.save();
+//   ride.status = "accepted";
+//   ride.driverId = req.user.id;
+//   ride.updatedAt = new Date();
+//   await ride.save();
 
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Ride accepted successfully",
-    data: ride,
-  });
-});
+//   sendResponse(res, {
+//     statusCode: 200,
+//     success: true,
+//     message: "Ride accepted successfully",
+//     data: ride,
+//   });
+// });
 
 /* =========================
 Ride starts
 PATCH /rides/:id/start
 ========================= */
-export const startRideController = catchAsync(async (req, res) => {
-  const ride = await RideModel.findById(req.params.id);
-  if (!ride) {
-    return sendResponse(res, {
-      statusCode: 404,
-      success: false,
-      message: "Ride not found",
-      data: null,
-    });
-  }
+// export const startRideController = catchAsync(async (req, res) => {
+//   const ride = await RideModel.findById(req.params.id);
+//   if (!ride) {
+//     return sendResponse(res, {
+//       statusCode: 404,
+//       success: false,
+//       message: "Ride not found",
+//       data: null,
+//     });
+//   }
 
-  if (ride.status !== "accepted") {
-    return sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "Ride cannot be started",
-      data: null,
-    });
-  }
+//   if (ride.status !== "accepted") {
+//     return sendResponse(res, {
+//       statusCode: 400,
+//       success: false,
+//       message: "Ride cannot be started",
+//       data: null,
+//     });
+//   }
 
-  ride.status = "ongoing"; // type-safe now
-  ride.startedAt = new Date();
-  ride.updatedAt = new Date();
-  await ride.save();
+//   ride.status = "accepted"; // type-safe now
+//   ride.startedAt = new Date();
+//   ride.updatedAt = new Date();
+//   await ride.save();
 
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Ride started successfully",
-    data: ride,
-  });
-});
+//   sendResponse(res, {
+//     statusCode: 200,
+//     success: true,
+//     message: "Ride started successfully",
+//     data: ride,
+//   });
+// });
 
 /* =========================
 Ride completes
@@ -411,7 +412,7 @@ export const completeRideController = catchAsync(async (req, res) => {
   }
 
   // এখন status type-safe
-  if (ride.status !== "ongoing") {
+  if (ride.status !== "accepted") {
     return sendResponse(res, {
       statusCode: 400,
       success: false,
@@ -576,18 +577,86 @@ export const nearbyDriversController = catchAsync(async (req, res) => {
 
 
 
+
+//driver accept ride, start ride, complete ride, cancel ride, adjust fare, add pickup schedule, rate driver, nearby drivers
+
+
+
+
+export const acceptRideController = catchAsync(async (req , res) => {
+  const { rideId } =  req.params as { rideId: string };
+
+  if (!req.user?.id) {
+    return sendResponse(res, {
+      statusCode: 401,
+      success: false,
+      message: "Unauthorized",
+      data: null,
+    });
+  }
+
+  const driverId = req.user.id;
+
+  // ✅ call SERVICE (not controller)
+  const result = await rideServices.acceptRide(
+    rideId,
+    driverId
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Ride accepted successfully",
+    data: result,
+  });
+});
+
+
+
+
+export const rejectRideController = catchAsync(async (req, res) => {
+  const { rideId } = req.params as { rideId: string };
+
+  if (!req.user?.id) {
+    return sendResponse(res, {
+      statusCode: 401,
+      success: false,
+      message: "Unauthorized",
+      data: null,
+    });
+  }
+
+  const driverId = req.user.id;
+
+  const result = await rideServices.rejectRide(
+    rideId,
+    driverId
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Ride rejected",
+    data: result,
+  });
+});
+
+
+
+
 export const ridecontroller = {
  createRideController,  
  getRideByIdController,
   listRidesController,
   updateRideStatusController,
     acceptRideController,
-  startRideController,
+  // startRideController,
   completeRideController,
     cancelRideController,
     adjustFareController,
     addPickupScheduleController,
     rateDriverController,
-    nearbyDriversController
+    nearbyDriversController,
+    // acceptRideController,
 };
 

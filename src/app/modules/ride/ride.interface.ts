@@ -10,12 +10,13 @@ export interface ILocation {
 export type RideStatus =
   | "pending"
   | "accepted"
-  | "ongoing"   // আগে "started" → এখন "ongoing"
+  | "rejected"   // আগে "started" → এখন "ongoing"
   | "completed"
   | "cancel";
 
 export interface IRide {
   userId: Types.ObjectId;
+  rejectedDrivers?: Types.ObjectId[]; // ✅ Add this field
   driverId?: Types.ObjectId;
   pickupLocation: ILocation;
   dropLocation: ILocation;

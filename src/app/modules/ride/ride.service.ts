@@ -3,6 +3,8 @@ import { RideModel } from "./ride.model";
 import { IRide } from './ride.interface';
 import User from "../user/user.model";
 import axios from "axios";
+import mongoose, { Types } from "mongoose";
+// import { io } from "../../server";
 
 /* =========================
 Create Ride
@@ -105,7 +107,96 @@ export const createRide = async (
 };
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//driver service export
+
+
+export const acceptRide = async (
+  rideId: string,
+  driverId: string
+) => {
+
+  const ride = await RideModel.findById(rideId);
+
+  if (!ride) {
+    throw new Error("Ride not found");
+  }
+
+  if (ride.status !== "pending") {
+    throw new Error("Ride already processed");
+  }
+
+   ride.driverId = new Types.ObjectId(driverId);
+  ride.status = "accepted";
+
+  await ride.save();
+
+  // ✅ notify user (socket optional)
+  io.to(ride.userId.toString()).emit("ride-accepted", {
+    rideId: ride._id,
+    driverId,
+  });
+
+  return ride;
+};
+
+
+
+
+
+
+export const rejectRide = async (
+  rideId: string,
+  driverId: string
+) => {
+
+  const ride = await RideModel.findById(rideId);
+
+  if (!ride) {
+    throw new Error("Ride not found");
+  }
+
+  if (ride.status !== "pending") {
+    throw new Error("Ride already processed");
+  }
+
+  // ✅ optional (recommended)
+  // rejected drivers list
+  if (!ride.rejectedDrivers) {
+    ride.rejectedDrivers = [];
+  }
+
+  ride.rejectedDrivers.push(
+    new Types.ObjectId(driverId)
+  );
+
+  await ride.save();
+
+  // ✅ notify user (optional)
+  io.to(ride.userId.toString()).emit("driver-rejected", {
+    rideId: ride._id,
+    driverId,
+  });
+
+  return ride;
+};
+
  export const rideServices = {
  createRide,
+ acceptRide,
+ rejectRide,
  getDistanceTime,
 };
