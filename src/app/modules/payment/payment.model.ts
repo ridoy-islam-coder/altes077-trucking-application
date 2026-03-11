@@ -1,25 +1,60 @@
 import { Schema, model } from "mongoose";
 import { IPayment } from "./payment.interface";
 
-const paymentSchema = new Schema<IPayment>({
-  rideId: { type: Schema.Types.ObjectId, ref: "Ride", required: true },
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  driverId: { type: Schema.Types.ObjectId, ref: "Driver", required: true },
+const paymentSchema = new Schema<IPayment>(
+  {
+    rideId: {
+      type: Schema.Types.ObjectId,
+      ref: "Ride",
+      required: true,
+    },
 
-  totalAmount: { type: Number, required: true },
-  adminCommission: { type: Number, required: true },
-  driverEarning: { type: Number, required: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
 
-  currency: { type: String, default: "usd" },
+    driverId: {
+      type: Schema.Types.ObjectId,
+      ref: "Driver",
+      required: true,
+    },
 
-  stripePaymentIntentId: String,
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
 
-  paymentStatus: {
-    type: String,
-    enum: ["pending", "paid", "failed"],
-    default: "pending",
+    adminCommission: {
+      type: Number,
+      required: true,
+    },
+
+    driverEarning: {
+      type: Number,
+      required: true,
+    },
+
+    currency: {
+      type: String,
+      default: "usd",
+    },
+
+    stripePaymentIntentId: {
+      type: String,
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed"],
+      default: "pending",
+    },
   },
-}, { timestamps: true });
+  {
+    timestamps: true,
+  }
+);
 
 export const PaymentModel = model<IPayment>(
   "Payment",
