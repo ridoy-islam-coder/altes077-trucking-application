@@ -56,7 +56,4 @@ const paymentSchema = new Schema<IPayment>(
   }
 );
 
-export const PaymentModel = model<IPayment>(
-  "Payment",
-  paymentSchema
-);
+export const PaymentModel = model<IPayment>("Payment",paymentSchema);

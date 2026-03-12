@@ -4,6 +4,7 @@ import { userRoutes } from '../modules/user/user.routes';
 import { adminRoutes } from '../modules/Dashboard/admin/admin.route';
 import { driverRoutes } from '../modules/drivermodel/driver.routes';
 import { authride } from '../modules/ride/ride.routes';
+import { PaymentRoutes } from '../modules/payment/payment.route';
 
 
 
@@ -31,6 +32,11 @@ const moduleRoutes = [
     path: '/rides',
     route: authride,
   },
+  {
+    path: '/payments',
+    route: PaymentRoutes,
+  },
+
 //   {
 //     path: '/subscription',
 //     route: SubscriptionRoutes,

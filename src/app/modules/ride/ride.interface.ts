@@ -15,6 +15,7 @@ export type RideStatus =
   | "cancel";
 
 export interface IRide {
+  _id: any;
   userId: Types.ObjectId;
   rejectedDrivers?: Types.ObjectId[]; // ✅ Add this field
   driverId?: Types.ObjectId;
