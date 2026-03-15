@@ -70,6 +70,9 @@ const driverSchema = new Schema<IDriver>(
       type: Number,
       required: true,
     },
+    stripe_account_id: {
+      type: String,
+    },
 
     // location: {
     //   type: {

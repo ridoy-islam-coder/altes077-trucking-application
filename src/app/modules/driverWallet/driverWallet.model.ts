@@ -9,6 +9,7 @@ const driverWalletSchema = new Schema<IDriverWallet>(
     driverId: { type: Schema.Types.ObjectId, ref: "Driver", required: true, unique: true },
     totalEarning: { type: Number, default: 0 },
     availableBalance: { type: Number, default: 0 },
+    totalWithdrawn: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

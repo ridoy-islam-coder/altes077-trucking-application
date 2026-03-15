@@ -95,7 +95,7 @@ export const createRide = async (
   const fare = hours * driver.hourRate;
       // 🚨 Add this check right after calculating fare
     if (isNaN(fare)) {
-        console.error({ distance: payload.distance, rate: driver.hourRate, driver, pickupLocation: payload.pickupLocation });
+        console.error({ distance: payload.distance, rate: driver.hourRate, driver, pickupLocation: payload.pickupLocation, vehicleType: driver.vehicleType , driveruserID: driver.userId });
         throw new Error('Fare calculation failed: distance or rate is invalid');
     }
 
@@ -134,6 +134,7 @@ export const acceptRide = async (
 ) => {
 
   const ride = await RideModel.findById(rideId);
+  
 
   if (!ride) {
     throw new Error("Ride not found");
@@ -143,8 +144,8 @@ export const acceptRide = async (
     throw new Error("Ride already processed");
   }
 
-   ride.driverId = new Types.ObjectId(driverId);
-  ride.status = "accepted";
+   ride.driveruserID = new Types.ObjectId(driverId);
+   ride.status = "accepted";
 
   await ride.save();
 
@@ -178,6 +179,7 @@ await saveNotification({
   //   });
   // }
 
+  
 export const rejectRide = async (
   rideId: string,
   driverId: string
@@ -213,9 +215,9 @@ export const rejectRide = async (
 await saveNotification({
     io,
     userId: ride.userId.toString(),
-    role: 'USER', // ✅ এখানে role ব্যবহার করতে হবে
-    title: 'Ride Accepted',
-    message: 'Your ride has been accepted by the driver',
+    role: 'USER', 
+    title: 'Ride Rejected',           // ❌ পরিবর্তন
+    message: 'Your ride has been rejected by the driver', // ❌ পরিবর্তন
     type: 'custom',
 });
 
@@ -223,7 +225,48 @@ await saveNotification({
   return ride;
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+export const getPendingRidesForDriver = async (
+  vehicleType: string,
+  lat?: number,
+  lng?: number,
+  radius?: number
+) => {
+  const query: any = {
+    status: "pending",       // Pending রাইড
+    vehicleType,             // Vehicle type অনুযায়ী filter
+  };
+
+  // Geo filter, যদি lat/lng/radius দেওয়া থাকে
+  if (lat && lng && radius) {
+    query.pickupLocation = {
+      $geoWithin: { $centerSphere: [[lng, lat], radius / 6371] },
+    };
+    console.log("🚀 [DEBUG] geo query:", query.pickupLocation);
+  }
+
+  const rides = await RideModel.find(query)
+    .populate("driveruserID", "userId vehicleType vehicleNumber")
+    .populate("userId", "name email");
+
+  console.log("🚀 [DEBUG] rides found:", rides.length);
+
+  return rides;
+};
+
  export const rideServices = {
+  getPendingRidesForDriver,
  createRide,
  acceptRide,
  rejectRide,

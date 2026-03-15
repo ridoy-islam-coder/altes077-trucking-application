@@ -305,48 +305,41 @@ export const getcalcutorprice = async (
   });
 
   if (captains.length === 0) {
-    return {
-      message: "No active drivers found",
-      data: [],
-    };
+    return { message: "No active drivers found", data: [] };
   }
 
   const driver = captains[0];
 
-  // example duration
   const hours = 20 / 60;
-
   const fare = Math.ceil(driver.hourRate * hours);
 
-  // ✅ Ride save using token userId
   const ride = await RideModel.create({
     userId,
     driverId: driver._id,
-
-    pickupLocation: {
-      lat,
-      lng,
-      address: "Pickup Location",
-    },
-
-    dropLocation: {
-      lat,
-      lng,
-      address: "Drop Location",
-    },
-
+    driveruserID: driver.userId,
+    vehicleType: driver.vehicleType,
     distance: 0,
     duration: 1200,
     fare,
+
+    pickupLocation: {
+      type: "Point",
+      coordinates: [lng, lat],
+      address: "Pickup Location"
+    },
+
+    dropLocation: {
+      type: "Point",
+      coordinates: [lng, lat],
+      address: "Drop Location"
+    }
   });
 
   return {
     captains,
-    ride,
+    ride
   };
 };
-
-
 
 
 

@@ -57,12 +57,7 @@ const UserSchema = new Schema<TUser, UserModel>(
        },
       select: false,
     },
-    // countryCode: {
-    //   type: String,
-    //   // required: function(this: TUser) { return this.isVerified === true; },
-    //   sparse: true, // 🔥 important
-      
-    // },
+   
 
     phoneNumber: {
       type: String,
@@ -94,7 +89,7 @@ const UserSchema = new Schema<TUser, UserModel>(
       type: String,
       enum: Object.values(UserRole),
       required: true,
-      // default: UserRole.agencies,  
+     
     },
   
     subscription: {
@@ -110,7 +105,7 @@ const UserSchema = new Schema<TUser, UserModel>(
         default: 'active',
       },
     },
-    //  location:{ "latitude": Number, "longitude": Number },
+   
  location: {
   type: {
     type: String,
@@ -145,7 +140,7 @@ const UserSchema = new Schema<TUser, UserModel>(
     },
   },
   {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    timestamps: true, 
   },
 );
 
@@ -227,176 +222,3 @@ UserSchema.pre('aggregate', function (next) {
 const User = model<TUser, UserModel>('User', UserSchema);
 
 export default User;
-
-
-// /* eslint-disable @typescript-eslint/no-this-alias */
-// import bcrypt from 'bcrypt';
-// import { model, Schema, Types } from 'mongoose';
-// import config from '../../config';
-// import { TUser, UserModel, UserRole } from './user.interface';
-
-// /* ---------------- Verification Schema ---------------- */
-
-// const VerificationSchema = new Schema({
-//   otp: { type: Number, required: true },
-//   expiresAt: Date,
-//   status: { type: Boolean, required: true },
-// });
-
-// /* ---------------- Image Schema ---------------- */
-
-// const imageSchema = new Schema({
-//   id: { type: String, required: true },
-//   url: { type: String, required: true },
-// });
-
-// /* ---------------- User Schema ---------------- */
-
-// const UserSchema = new Schema<TUser, UserModel>(
-//   {
-//     email: {
-//       type: String,
-//       unique: true,
-//       required: function (this: TUser) {
-//         return this.isVerified === true;
-//       },
-//     },
-
-//     image: imageSchema,
-
-//     fullName: String,
-
-//     password: {
-//       type: String,
-//       required: function (this: TUser) {
-//         return this.isVerified === true;
-//       },
-//       select: false,
-//     },
-
-//     phoneNumber: {
-//       type: String,
-//       sparse: true,
-//       unique: true,
-//     },
-
-//     needsPasswordChange: {
-//       type: Boolean,
-//       default: false,
-//     },
-
-//     passwordChangedAt: Date,
-
-//     accountType: {
-//       type: String,
-//       enum: ['emailvarifi', 'google', 'facebook', 'linkedin', 'apple'],
-//       default: 'emailvarifi',
-//     },
-
-//     status: {
-//       type: String,
-//       enum: ['active', 'inactive'],
-//       default: 'inactive',
-//     },
-
-//     role: {
-//       type: String,
-//       enum: Object.values(UserRole),
-//       required: true,
-//     },
-
-//     subscription: {
-//       plan: {
-//         type: Schema.Types.ObjectId,
-//         ref: 'Subscription',
-//       },
-//       startsAt: Date,
-//       expiresAt: Date,
-//       status: {
-//         type: String,
-//         enum: ['active', 'expired', 'cancelled'],
-//         default: 'active',
-//       },
-//     },
-
-//     location: {
-//       type: {
-//         type: String,
-//         enum: ['Point'],
-//         default: 'Point',
-//       },
-//       coordinates: {
-//         type: [Number],
-//       },
-//     },
-
-//     // ✅ SOCKET FIELD
-//     socketId: {
-//       type: String,
-//       default: null,
-//     },
-
-//     isActive: { type: Boolean, default: true },
-//     isVerified: { type: Boolean, default: false },
-//     isDeleted: { type: Boolean, default: false },
-
-//     verification: VerificationSchema,
-//   },
-//   {
-//     timestamps: true,
-//   }
-// );
-
-// /* ---------------- PASSWORD HASH ---------------- */
-
-// UserSchema.pre('save', async function (next) {
-//   if (!this.isModified('password')) return next();
-
-//   this.password = await bcrypt.hash(
-//     this.password as string,
-//     Number(config.bcrypt_salt_rounds)
-//   );
-
-//   next();
-// });
-
-// /* ---------------- GEO INDEX ---------------- */
-
-// UserSchema.index({ location: '2dsphere' });
-
-// /* ---------------- REMOVE PASSWORD ---------------- */
-
-// UserSchema.post('save', function (doc, next) {
-//   doc.password = '';
-//   next();
-// });
-
-// /* ---------------- ✅ FIXED MIDDLEWARE ---------------- */
-
-// UserSchema.pre(/^find/, function (next) {
-//   this.where({ isDeleted: { $ne: true } });
-//   next();
-// });
-
-// /* ---------------- STATIC METHODS ---------------- */
-
-// UserSchema.statics.isUserExist = async function (email: string) {
-//   return this.findOne({ email }).select('+password');
-// };
-
-// UserSchema.statics.IsUserExistbyId = async function (id: string) {
-//   return this.findOne({
-//     _id: new Types.ObjectId(id),
-//     isDeleted: { $ne: true },
-//   }).select('+password');
-// };
-
-// UserSchema.statics.isPasswordMatched = async function (
-//   plain: string,
-//   hashed: string
-// ) {
-//   return bcrypt.compare(plain, hashed);
-// };
-
-// const User = model<TUser, UserModel>('User', UserSchema);
-// export default User;

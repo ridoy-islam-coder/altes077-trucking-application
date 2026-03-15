@@ -30,4 +30,5 @@ export interface IDriver extends Document {
   hourRate: number;
   location: ILocation;
   timestamp: Date;
+  stripe_account_id?: string; // 🔹 Stripe account ID
 }

@@ -66,7 +66,8 @@ Future Ride APIs
 /* =========================
 Driver APIs
 ========================= */
-router.patch("/status/:id/accept", auth(USER_ROLE.DRIVER), ridecontroller.acceptRideController);
+//rider accept ride
+router.patch("/status/:rideId", auth(USER_ROLE.DRIVER), ridecontroller.acceptRideController);
 // router.patch("/status/:id/start", auth(USER_ROLE.DRIVER), ridecontroller.startRideController);
 router.patch("/status/:id/complete", auth(USER_ROLE.DRIVER), ridecontroller.completeRideController);
 
@@ -74,7 +75,7 @@ router.patch("/status/:id/complete", auth(USER_ROLE.DRIVER), ridecontroller.comp
 
 
 /* Cancel ride by user */
-router.patch("/rides/:id/cancel", auth(USER_ROLE.USER,USER_ROLE.DRIVER),ridecontroller.cancelRideController);
+router.patch("/cancel/:id", auth(USER_ROLE.USER,USER_ROLE.DRIVER),ridecontroller.cancelRideController);
 
 /* Adjust fare / refund */
 router.patch("/rides/:id", auth(USER_ROLE.USER), ridecontroller.adjustFareController);
@@ -84,6 +85,8 @@ router.patch("/review/:id", auth(USER_ROLE.USER), ridecontroller.rateDriverContr
 
 /* Nearby drivers search */
 router.get("/drivers/nearby", auth(USER_ROLE.USER, USER_ROLE.DRIVER), ridecontroller.nearbyDriversController);
+
+router.get("/pending",auth(USER_ROLE.DRIVER), ridecontroller.getPendingRidesForDriverController);
 
 
 

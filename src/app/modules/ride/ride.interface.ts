@@ -34,6 +34,8 @@ export interface IRide {
   userNotes?: string; // ✅ Add this field
 distanceText: string; // ✅ Add this field
 durationText: string; // ✅ Add this field
+driveruserID: Types.ObjectId; // ✅ Add this field
+vehicleType: string; // ✅ Add this field
     // ✅ Add these fields
   driverRating: Number,
   driverReview: String,

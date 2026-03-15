@@ -5,7 +5,7 @@ import sendResponse from "../../utils/sendResponse";
 import { DriverModel } from "../drivermodel/dirver.model";
 import User from "../user/user.model";
 import { RideModel } from "./ride.model";
-import { rideServices } from "./ride.service";
+import { getPendingRidesForDriver, rideServices } from "./ride.service";
 import { io } from "../../../server";
 
 
@@ -452,7 +452,7 @@ export const cancelRideController = catchAsync(async (req, res) => {
     });
   }
 
-  if (ride.status === "completed" || ride.status === "cancel") {
+  if (ride.status === "completed" ||  ride.status === "cancel") {
     return sendResponse(res, {
       statusCode: 400,
       success: false,
@@ -544,6 +544,9 @@ export const rateDriverController = catchAsync(async (req, res) => {
     data: ride,
   });
 });
+
+
+
 export const nearbyDriversController = catchAsync(async (req, res) => {
   const { lat, lng, radius = 5000 } = req.query; // radius in meters
 
@@ -586,6 +589,7 @@ export const nearbyDriversController = catchAsync(async (req, res) => {
 
 export const acceptRideController = catchAsync(async (req , res) => {
   const { rideId } =  req.params as { rideId: string };
+  console.log("🚀 rideId from params:", req.params.rideId);
 
   if (!req.user?.id) {
     return sendResponse(res, {
@@ -646,6 +650,52 @@ export const rejectRideController = catchAsync(async (req, res) => {
 
 
 
+
+
+
+
+
+// Controller
+export const getPendingRidesForDriverController = catchAsync(
+  async (req, res) => {
+    const driverId = req.user?.id;
+
+    if (!driverId) {
+      return sendResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      });
+    }
+
+    const { lat, lng, radius, type } = req.query;
+
+    if (!type) {
+      return sendResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "Vehicle type is required",
+        data: null,
+      });
+    }
+
+    const rides = await getPendingRidesForDriver(
+      type as string,
+      lat ? Number(lat) : undefined,
+      lng ? Number(lng) : undefined,
+      radius ? Number(radius) : undefined
+    );
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Pending rides fetched successfully",
+      data: rides,
+    });
+  }
+);
+
 export const ridecontroller = {
  createRideController,  
  getRideByIdController,
@@ -660,5 +710,6 @@ export const ridecontroller = {
     rateDriverController,
     nearbyDriversController,
     // acceptRideController,
+    getPendingRidesForDriverController,
 };
 

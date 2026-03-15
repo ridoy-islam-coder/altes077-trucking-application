@@ -31,12 +31,13 @@ import Stripe from "stripe";
 import config from "../../config";
 import { RideModel } from "../ride/ride.model";
 import { addEarning } from "../driverWallet/driverWallet.service";
-
 import catchAsync from "../../utils/catchAsync";
 import httpStatus from "http-status";
 import AppError from "../../error/AppError";
 import { PaymentModel } from "./payment.model";
 import StripeUtils from "../../utils/stripe.utils";
+import { DriverModel } from "../drivermodel/dirver.model";
+
 
 const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
   apiVersion: "2024-06-20" as any,
@@ -160,3 +161,43 @@ export const confirmPaymentAPI = catchAsync(async (req: Request, res: Response) 
     paymentRecord,
   });
 });
+
+
+
+export const createStripeAccount = async (req: Request, res: Response) => {
+  const driverId = req.user.id;
+
+  const driver = await DriverModel.findById(driverId);
+  if (!driver) return res.status(404).json({ success: false, message: "Driver not found" });
+
+  if (driver.stripe_account_id) {
+    return res.json({
+      success: true,
+      message: "Stripe account already exists",
+      stripe_account_id: driver.stripe_account_id,
+    });
+  }
+
+  const account = await stripe.accounts.create({
+    type: "express",
+    country: "US",
+    email: driver.email,
+  });
+
+  driver.stripe_account_id = account.id;
+  await driver.save();
+
+  const accountLink = await stripe.accountLinks.create({
+    account: account.id,
+    refresh_url: `${process.env.FRONTEND_URL}/stripe/refresh`,
+    return_url: `${process.env.FRONTEND_URL}/stripe/return`,
+    type: "account_onboarding",
+  });
+
+  res.json({
+    success: true,
+    message: "Stripe account created. Complete onboarding using accountLink.url",
+    stripe_account_id: account.id,
+    accountLinkUrl: accountLink.url,
+  });
+};

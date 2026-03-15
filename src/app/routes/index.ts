@@ -5,6 +5,7 @@ import { adminRoutes } from '../modules/Dashboard/admin/admin.route';
 import { driverRoutes } from '../modules/drivermodel/driver.routes';
 import { authride } from '../modules/ride/ride.routes';
 import { PaymentRoutes } from '../modules/payment/payment.route';
+import { WithdrawRoutes } from '../modules/withdraw/withdraw.route';
 
 
 
@@ -35,6 +36,9 @@ const moduleRoutes = [
   {
     path: '/payments',
     route: PaymentRoutes,
+  },{
+    path: '/withdraw',
+    route: WithdrawRoutes,
   },
 
 //   {

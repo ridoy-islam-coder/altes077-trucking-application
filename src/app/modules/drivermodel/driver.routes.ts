@@ -21,7 +21,7 @@ router.get("/suggestions", driverController.getAutoSuggestions);
 router.get("/captains-radius", driverController.getCaptainsInRadiusController);
 // router.patch('/location/by-address',auth(),driverController.updateDriverLocationByAddress);
 // ✅ Route
-router.get("/create-rides", auth(USER_ROLE.USER),driverController.getcalcutorfar  );
+router.get("/create-rides", auth(USER_ROLE.USER),driverController.getcalcutorfar);
 
 
 

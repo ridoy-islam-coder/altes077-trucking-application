@@ -91,3 +91,8 @@ export const payRideService = async (userId: string, ride: IRide) => {
     paymentRecord: paymentDoc,
   };
 };
+
+
+
+
+
