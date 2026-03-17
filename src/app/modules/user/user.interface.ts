@@ -47,6 +47,7 @@ export interface TUser {
   isActive: boolean;
   isDeleted: boolean;
   verification: Verification;
+  stripe_customer_id?: string | null;
   accountType?: 'emailvarifi' | 'google' | 'facebook' | 'linkedin' | 'apple';
   // countryCode: string;
   location: ILocation;

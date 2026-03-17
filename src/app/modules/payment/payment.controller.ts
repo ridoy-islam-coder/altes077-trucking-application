@@ -37,6 +37,9 @@ import AppError from "../../error/AppError";
 import { PaymentModel } from "./payment.model";
 import StripeUtils from "../../utils/stripe.utils";
 import { DriverModel } from "../drivermodel/dirver.model";
+import { IDriver } from "../drivermodel/driver.interface";
+import { TUser } from "../user/user.interface";
+import User from "../user/user.model";
 
 
 const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
@@ -55,13 +58,13 @@ export const payForRideAPI = catchAsync(async (req: Request, res: Response) => {
     return res.status(404).json({ success: false, message: "Ride not found" });
   }
 
-  if (!ride.driverId) {
+  if (!ride.driveruserID) {
     return res.status(400).json({ success: false, message: "Driver not assigned for this ride" });
   }
 
   const amount = ride.fare;
-  const driverId = ride.driverId.toString();
-
+  const driverId = ride.driveruserID.toString();
+   console.log("Driver ID:", driverId);
   // Get Stripe customer ID (existing or new)
   const customerId = await StripeUtils.checkCustomerId(req.user.stripe_customer_id, req.user.email);
   if (!customerId) {
@@ -103,7 +106,7 @@ export const payForRideAPI = catchAsync(async (req: Request, res: Response) => {
     stripePaymentIntentId: paymentIntent.id,
     paymentStatus: "pending",
   });
-
+ console.log("Payment record created:", paymentRecord);
   // Send response for mobile client
   res.status(201).json({
     success: true,
@@ -164,40 +167,57 @@ export const confirmPaymentAPI = catchAsync(async (req: Request, res: Response) 
 
 
 
+
+
 export const createStripeAccount = async (req: Request, res: Response) => {
-  const driverId = req.user.id;
+  try {
+    const driverId = req.user.id;
 
-  const driver = await DriverModel.findById(driverId);
-  if (!driver) return res.status(404).json({ success: false, message: "Driver not found" });
+    // findById এর result কে IDriver হিসেবে টাইপ কাস্ট করা
+    const driverDoc = await User.findById(driverId);
+    if (!driverDoc) {
+      return res.status(404).json({ success: false, message: "Driver not found" });
+    }
 
-  if (driver.stripe_account_id) {
-    return res.json({
-      success: true,
-      message: "Stripe account already exists",
-      stripe_account_id: driver.stripe_account_id,
+    // TypeScript safe cast
+    const driver = driverDoc.toObject() as TUser & { stripe_account_id?: string };
+
+    // যদি আগে থেকে stripe account থাকে
+    if (driver.stripe_account_id) {
+      return res.json({
+        success: true,
+        message: "Stripe account already exists",
+        stripe_account_id: driver.stripe_account_id,
+      });
+    }
+
+    // নতুন stripe account create করা
+    const account = await stripe.accounts.create({
+      type: "express",
+      country: "US",
+      email: driver.email,
     });
+
+    // driverDoc এ save করা
+    driverDoc.stripe_account_id = account.id;
+    await driverDoc.save();
+    //{process.env.FRONTEND_URL}/stripe/return
+    // stripe account link generate করা
+    const accountLink = await stripe.accountLinks.create({
+      account: account.id,
+       refresh_url: "http://localhost:5000/api/v1/stripe/refresh",
+       return_url: "http://localhost:3000/stripe/return",
+      type: "account_onboarding",
+    });
+
+    res.json({
+      success: true,
+      message: "Stripe account created. Complete onboarding using accountLink.url",
+      stripe_account_id: account.id,
+      accountLinkUrl: accountLink.url,
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
-
-  const account = await stripe.accounts.create({
-    type: "express",
-    country: "US",
-    email: driver.email,
-  });
-
-  driver.stripe_account_id = account.id;
-  await driver.save();
-
-  const accountLink = await stripe.accountLinks.create({
-    account: account.id,
-    refresh_url: `${process.env.FRONTEND_URL}/stripe/refresh`,
-    return_url: `${process.env.FRONTEND_URL}/stripe/return`,
-    type: "account_onboarding",
-  });
-
-  res.json({
-    success: true,
-    message: "Stripe account created. Complete onboarding using accountLink.url",
-    stripe_account_id: account.id,
-    accountLinkUrl: accountLink.url,
-  });
 };

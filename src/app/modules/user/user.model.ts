@@ -91,6 +91,7 @@ const UserSchema = new Schema<TUser, UserModel>(
       required: true,
      
     },
+      stripe_customer_id: {type: String, default: null},
   
     subscription: {
       plan: {
