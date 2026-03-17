@@ -145,6 +145,7 @@ const rideSchema = new Schema<IRide>(
     distance: { type: Number, required: true },
     duration: { type: Number, required: true },
     fare: { type: Number, required: true },
+   
     status: {
       type: String,
       enum: ["pending", "accepted", "started", "completed", "cancel"],

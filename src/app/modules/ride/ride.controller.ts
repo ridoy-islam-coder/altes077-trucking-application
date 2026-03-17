@@ -5,8 +5,9 @@ import sendResponse from "../../utils/sendResponse";
 import { DriverModel } from "../drivermodel/dirver.model";
 import User from "../user/user.model";
 import { RideModel } from "./ride.model";
-import { getPendingRidesForDriver, rideServices } from "./ride.service";
+import { getPendingRidesForDriver, rideServices, rideServices } from "./ride.service";
 import { io } from "../../../server";
+import mongoose from "mongoose";
 
 
 // export const createRideController = catchAsync(async (req, res) => {
@@ -754,9 +755,158 @@ export const getPendingRidesForDriverController = catchAsync(
 );
 
 
+// ride.controller.ts
+
+ const getCompletedRidesController = catchAsync(
+  async (req, res) => {
+    const userId = req.user?.id;
+
+    // ✅ authorization check
+    if (!userId) {
+      return sendResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      });
+    }
+
+    // ✅ fetch completed rides
+    const rides = await RideModel.find({
+      userId: userId,
+      status: "completed",
+    })
+      .populate("driverId")
+      .sort({ createdAt: -1 });
+
+    // ✅ response (your format)
+    return sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Completed rides fetched successfully",
+      data: rides,
+    });
+  }
+);
+
+
+ const getacceptedRidesController = catchAsync(
+  async (req, res) => {
+    const userId = req.user?.id;
+
+    // ✅ authorization check
+    if (!userId) {
+      return sendResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      });
+    }
+
+    // ✅ fetch completed rides
+    const rides = await RideModel.find({
+      userId: userId,
+      status: "accepted",
+    })
+      .populate("driverId")
+      .sort({ createdAt: -1 });
+
+    // ✅ response (your format)
+    return sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Accepted rides fetched successfully",
+      data: rides,
+    });
+  }
+);
+
+const getRideDetailsController = catchAsync(
+  async (req, res) => {
+    const userId = req.user?.id;
+    const { rideId } = req.params;
+
+    // ✅ auth check
+    if (!userId) {
+      return sendResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      });
+    }
+
+    // ✅ invalid id check
+    if (!mongoose.Types.ObjectId.isValid(rideId as string)) {
+      return sendResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "Invalid ride id",
+        data: null,
+      });
+    }
+
+    // ✅ find ride
+    const ride = await RideModel.findOne({
+      _id: rideId,
+      userId: userId, // user can see only own ride
+    })
+      .populate("driverId", "name phone vehicleType")
+      .populate("userId", "name phone");
+
+    // ✅ not found
+    if (!ride) {
+      return sendResponse(res, {
+        statusCode: 404,
+        success: false,
+        message: "Ride not found",
+        data: null,
+      });
+    }
+
+    // ✅ response
+    return sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Ride details fetched successfully",
+      data: ride,
+    });
+  }
+);
 
 
 
+
+
+
+
+
+// driver.controller.ts
+
+const getDriverDashboardController = catchAsync(
+  async (req, res) => {
+    const driverId = req.user?.id;
+
+    if (!driverId) {
+      return sendResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      });
+    }
+
+    const dashboardData = await rideServices.getDriverDashboardService(driverId);
+
+    return sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Driver dashboard data fetched successfully",
+      data: dashboardData,
+    });
+  }
+);
 
 
 export const ridecontroller = {
@@ -765,6 +915,9 @@ export const ridecontroller = {
   listRidesController,
   updateRideStatusController,
     acceptRideController,
+    getacceptedRidesController,
+    rejectRideController,
+    getDriverDashboardController,
   // startRideController,
   completeRideController,
     cancelRideController,
@@ -773,6 +926,8 @@ export const ridecontroller = {
     rateDriverController,
     nearbyDriversController,
     getRideHistoryController,
+    getCompletedRidesController,
+    getRideDetailsController,
     // acceptRideController,
     getPendingRidesForDriverController,
 };

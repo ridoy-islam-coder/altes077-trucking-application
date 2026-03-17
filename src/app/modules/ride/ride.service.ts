@@ -7,6 +7,7 @@ import mongoose, { Types } from "mongoose";
 import { saveNotification } from "../notification/saveNotification";
 import { io } from '../../../server'; // server.ts থেকে export করা io
 import { Server } from 'socket.io';
+import { DriverWalletModel } from "../driverWallet/driverWallet.model";
 // import { io } from "../../server";
 
 /* =========================
@@ -265,10 +266,49 @@ export const getPendingRidesForDriver = async (
   return rides;
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+export const getDriverDashboardService = async (driverId: string) => {
+  const driverObjectId = new mongoose.Types.ObjectId(driverId);
+
+  // ✅ total completed jobs
+  const totalJobs = await RideModel.countDocuments({
+    driverId: driverObjectId,
+    status: "completed",
+  });
+
+  // ✅ wallet info
+  const wallet = await DriverWalletModel.findOne({
+    driverId: driverObjectId,
+  });
+
+  // ✅ total reviews
+  const totalReviews = await RideModel.countDocuments({
+    driverId: driverObjectId,
+  });
+
+  return {
+    totalJobs,
+    totalEarnings: wallet?.totalEarning || 0,
+    totalReviews,
+  };
+};
+
  export const rideServices = {
   getPendingRidesForDriver,
  createRide,
  acceptRide,
  rejectRide,
  getDistanceTime,
+ getDriverDashboardService
 };

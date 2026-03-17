@@ -94,8 +94,16 @@ router.get("/pending",auth(USER_ROLE.DRIVER), ridecontroller.getPendingRidesForD
 
 // Get ride history for user data 
 router.get("/all-accepted-completed", auth(USER_ROLE.USER), ridecontroller.getRideHistoryController);
+router.get("/all-accepted", auth(USER_ROLE.USER), ridecontroller.getacceptedRidesController);
+router.get("/all-completed", auth(USER_ROLE.USER), ridecontroller.getCompletedRidesController);
 
 
+//all datiels data 
+
+router.get("/details/:id", auth(USER_ROLE.USER, USER_ROLE.DRIVER), ridecontroller.getRideDetailsController);
+
+// Driver dashboard data to get total rides, earnings, ratings, etc.
+router.get("/driver-dashboard", auth(USER_ROLE.DRIVER), ridecontroller.getDriverDashboardController);
 
 
 export const authride = router;
