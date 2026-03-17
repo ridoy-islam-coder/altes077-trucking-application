@@ -66,21 +66,21 @@ const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
 
 
 
-export const withdrawService = async (driverId: string, amount: number) => {
+export const withdrawService = async (driverUserId: string, amount: number) => {
 
   // 1️⃣ Find driver by userId
   const driver = await DriverModel.findOne({
-    userId: new mongoose.Types.ObjectId(driverId)
+    userId: new mongoose.Types.ObjectId(driverUserId)
   });
   if (!driver) throw new Error("Driver not found");
 
-  // 2️⃣ Find wallet by driver._id
-  let wallet = await DriverWalletModel.findOne({ driverId: driver._id });
+  // 2️⃣ Find wallet by driver._id (single wallet per driver)
+  let wallet = await DriverWalletModel.findOne({ driverId: driver.userId });
 
-  // 3️⃣ Auto-create wallet if not exist
+  // 3️⃣ Auto-create wallet only if missing
   if (!wallet) {
     wallet = await DriverWalletModel.create({
-      driverId: driver._id,
+      driverId: driver.userId,
       availableBalance: 0,
       totalEarning: 0,
       totalWithdrawn: 0,
@@ -101,7 +101,7 @@ export const withdrawService = async (driverId: string, amount: number) => {
 
   // 6️⃣ Create withdraw record
   const withdraw = await WithdrawModel.create({
-    driverId: driver._id,
+    driverId: driver.userId,
     amount,
     status: "processing",
   });
@@ -112,7 +112,7 @@ export const withdrawService = async (driverId: string, amount: number) => {
       {
         amount: Math.round(amount * 100), // dollars to cents
         currency: "usd",
-        method: "standard", // safe method
+        method: "standard",
       },
       {
         stripeAccount: driver.stripe_account_id,

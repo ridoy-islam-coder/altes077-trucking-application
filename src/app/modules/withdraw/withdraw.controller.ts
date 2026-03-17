@@ -31,7 +31,6 @@ import { withdrawService } from "./withdraw.service";
 // };
 
 
-
 export const withdrawMoney = async (req: Request, res: Response) => {
   try {
     const driverId = req.user.id; // JWT token থেকে driver userId

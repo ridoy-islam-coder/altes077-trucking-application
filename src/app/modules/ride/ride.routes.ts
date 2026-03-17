@@ -91,4 +91,11 @@ router.get("/pending",auth(USER_ROLE.DRIVER), ridecontroller.getPendingRidesForD
 
 
 
+
+// Get ride history for user data 
+router.get("/all-accepted-completed", auth(USER_ROLE.USER), ridecontroller.getRideHistoryController);
+
+
+
+
 export const authride = router;

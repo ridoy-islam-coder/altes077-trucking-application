@@ -696,6 +696,69 @@ export const getPendingRidesForDriverController = catchAsync(
   }
 );
 
+
+
+
+
+
+
+
+
+
+
+ const getRideHistoryController = catchAsync(
+  async (req, res) => {
+    const userId = req.user?.id;
+
+    // ✅ authorization check
+    if (!userId) {
+      return sendResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      });
+    }
+
+    // ✅ get rides
+    const rides = await RideModel.find({
+      userId: userId,
+      status: { $in: ["accepted", "completed"] },
+    })
+      .populate({
+        path: "driverId",
+        select: "name phone vehicleType",
+      })
+      .sort({ createdAt: -1 });
+
+    // ✅ separate data
+    const accepted = rides.filter(
+      (ride) => ride.status === "accepted"
+    );
+
+    const completed = rides.filter(
+      (ride) => ride.status === "completed"
+    );
+
+    // ✅ response (your format)
+    return sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Ride history fetched successfully",
+      data: {
+        accepted,
+        completed,
+      },
+    });
+  }
+);
+
+
+
+
+
+
+
 export const ridecontroller = {
  createRideController,  
  getRideByIdController,
@@ -709,6 +772,7 @@ export const ridecontroller = {
     addPickupScheduleController,
     rateDriverController,
     nearbyDriversController,
+    getRideHistoryController,
     // acceptRideController,
     getPendingRidesForDriverController,
 };
