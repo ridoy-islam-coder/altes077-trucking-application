@@ -3,6 +3,7 @@
 import httpStatus from 'http-status';
 import { Admin } from './admin.model';
 import AppError from '../../../error/AppError';
+import { RideModel } from '../../ride/ride.model';
 
 const updateAdminProfile = async (id: string, payload: Record<string, any>) => {
   const allowedFields = ['fullName', 'phoneNumber', 'image'];
@@ -79,10 +80,65 @@ const resetPassword = async (email: string, newPassword: string) => {
   await admin.save();
 };
 
+
+
+
+
+
+
+
+
+
+
+
+const getRideStats = async () => {
+  const stats = await RideModel.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalJobs: { $sum: 1 },
+
+        acceptedJobs: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "accepted"] }, 1, 0],
+          },
+        },
+
+        cancelJobs: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "cancel"] }, 1, 0],
+          },
+        },
+      },
+    },
+  ]);
+
+  return stats[0] || {
+    totalJobs: 0,
+    acceptedJobs: 0,
+    cancelJobs: 0,
+  };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const adminService = {
   updateAdminProfile,
   changePassword,
   setForgotOtp,
   verifyOtp,
   resetPassword,
+  getRideStats,
 };

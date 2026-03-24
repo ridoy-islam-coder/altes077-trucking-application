@@ -5,7 +5,7 @@ import sendResponse from "../../utils/sendResponse";
 import { DriverModel } from "../drivermodel/dirver.model";
 import User from "../user/user.model";
 import { RideModel } from "./ride.model";
-import { getPendingRidesForDriver, rideServices, rideServices } from "./ride.service";
+import { getPendingRidesForDriver, rideServices, } from "./ride.service";
 import { io } from "../../../server";
 import mongoose from "mongoose";
 
@@ -916,7 +916,7 @@ export const ridecontroller = {
   updateRideStatusController,
     acceptRideController,
     getacceptedRidesController,
-    rejectRideController,
+    // rejectRideController,
     getDriverDashboardController,
   // startRideController,
   completeRideController,
