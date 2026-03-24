@@ -32,7 +32,8 @@ router.get("/stats",auth('admin'), adminControllers.getRideStats);
 router.get("/drivers",auth('admin'), adminControllers.getAllDrivers);
 //driver by user id
 router.get( '/by-user/:userId',auth('admin'),adminControllers.getDriverByUserId);
-
+// Driver approval stats count
+router.get("/drivers/stats",auth('admin'), adminControllers.getDriverStats);
 // Approve or reject driver
 router.patch('/approve/:driverId', auth('admin'), adminControllers.approveDriver);
 router.patch('/reject/:driverId', auth('admin'), adminControllers.rejectDriver);

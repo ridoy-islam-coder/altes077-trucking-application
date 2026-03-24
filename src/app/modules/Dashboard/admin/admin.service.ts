@@ -176,6 +176,21 @@ const rejectDriver = async (driverId: string) => {
 
 
 
+
+
+const getDriverStats = async () => {
+  const totalDrivers = await DriverModel.countDocuments({});
+  const approvedDrivers = await DriverModel.countDocuments({ isApproved: true });
+  const rejectedDrivers = await DriverModel.countDocuments({ isApproved: false });
+
+  return {
+    totalDrivers,
+    approvedDrivers,
+    rejectedDrivers,
+  };
+};
+
+
 export const adminService = {
   updateAdminProfile,
   changePassword,
@@ -187,4 +202,5 @@ export const adminService = {
   getDriverByUserId,
   approveDriver,
   rejectDriver,
+  getDriverStats,
 };

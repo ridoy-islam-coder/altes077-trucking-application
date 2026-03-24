@@ -167,6 +167,7 @@ export const getCaptainsInThedriver = async (
 
   const query = {
     status: "active",    // ✅ only active drivers
+    isApproved: true,   // ✅ only approved drivers
     vehicleType: type,          // ✅ only the type provided by user
     location: {
       $geoWithin: {
@@ -296,6 +297,7 @@ export const getcalcutorprice = async (
 
   const captains = await DriverModel.find({
     status: "active",
+    isApproved: true,
     vehicleType: type,
     location: {
       $geoWithin: {

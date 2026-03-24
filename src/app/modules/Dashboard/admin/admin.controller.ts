@@ -306,6 +306,28 @@ const rejectDriver = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+
+
+
+
+const getDriverStats = catchAsync(async (req: Request, res: Response) => {
+  const stats = await adminService.getDriverStats();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Driver stats fetched successfully',
+    data: stats,
+  });
+});
+
+
+
+
+
+
+
+
 export const adminControllers = {
   adminRegister,
   adminLogin,
@@ -320,5 +342,6 @@ export const adminControllers = {
   getDriverByUserId,
   approveDriver,
   rejectDriver,
+  getDriverStats,
 
 };
