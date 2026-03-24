@@ -4,6 +4,9 @@ import httpStatus from 'http-status';
 import { Admin } from './admin.model';
 import AppError from '../../../error/AppError';
 import { RideModel } from '../../ride/ride.model';
+import User from '../../user/user.model';
+import { DriverModel } from '../../drivermodel/dirver.model';
+import { Types } from 'mongoose';
 
 const updateAdminProfile = async (id: string, payload: Record<string, any>) => {
   const allowedFields = ['fullName', 'phoneNumber', 'image'];
@@ -128,9 +131,48 @@ const getRideStats = async () => {
 
 
 
+const getAllDrivers = async () => {
+  
+  const drivers = await User.find({ role: 'DRIVER', isDeleted: false })
+    .select('-password') 
+    .sort({ createdAt: -1 }); // latest first
+
+  return drivers;
+};
 
 
 
+const getDriverByUserId = async (userId: string) => {
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new Error('Invalid userId');
+  }
+
+  const driver = await DriverModel.findOne({ userId: new Types.ObjectId(userId) });
+
+  if (!driver) return null;
+
+  return driver;
+};
+
+const approveDriver = async (driverId: string) => {
+  const driver = await DriverModel.findById(driverId);
+  if (!driver) throw new Error('Driver not found');
+
+  driver.isApproved = true;
+  driver.status = 'active'; // optional: activate after approval
+  await driver.save();
+  return driver;
+};
+
+const rejectDriver = async (driverId: string) => {
+  const driver = await DriverModel.findById(driverId);
+  if (!driver) throw new Error('Driver not found');
+
+  driver.isApproved = false;
+  driver.status = 'inactive'; // optional: deactivate rejected driver
+  await driver.save();
+  return driver;
+};
 
 
 
@@ -141,4 +183,8 @@ export const adminService = {
   verifyOtp,
   resetPassword,
   getRideStats,
+  getAllDrivers,
+  getDriverByUserId,
+  approveDriver,
+  rejectDriver,
 };

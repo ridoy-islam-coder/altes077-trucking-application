@@ -241,14 +241,69 @@ const getRideStats = catchAsync(async (req, res) => {
 
 
 
+const getAllDrivers = catchAsync(async (req: Request, res: Response) => {
+  const drivers = await adminService.getAllDrivers();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Drivers fetched successfully',
+    data: drivers,
+  });
+});
 
 
 
 
 
 
+const getDriverByUserId = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params;
 
+  const driver = await adminService.getDriverByUserId(userId as string);
 
+  if (!driver) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: 'Driver not found',
+      data: null,
+    });
+  }
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Driver fetched successfully',
+    data: driver,
+  });
+});
+
+const approveDriver = catchAsync(async (req: Request, res: Response) => {
+  const { driverId } = req.params;
+
+  const driver = await adminService.approveDriver(driverId as string);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Driver approved successfully',
+    data: driver,
+  });
+});
+
+const rejectDriver = catchAsync(async (req: Request, res: Response) => {
+  const { driverId } = req.params;
+
+  const driver = await adminService.rejectDriver(driverId as string);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Driver rejected successfully',
+    data: driver,
+  });
+});
 
 
 export const adminControllers = {
@@ -261,4 +316,9 @@ export const adminControllers = {
   resetPassword,
   getProfile,
   getRideStats,
+  getAllDrivers,
+  getDriverByUserId,
+  approveDriver,
+  rejectDriver,
+
 };

@@ -23,7 +23,7 @@ export interface IDriver extends Document {
    images: IImage[]; // 🔹 multiple images
 
   status: "active" | "inactive";
-
+  isApproved: boolean; // 🔹 new field for approval status
   vehicleType: string;
   vehicleCapacity: string;
   vehicleColor: Number;

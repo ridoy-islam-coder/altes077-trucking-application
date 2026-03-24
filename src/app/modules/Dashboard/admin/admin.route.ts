@@ -27,9 +27,15 @@ router.post('/verify-otp', adminControllers.verifyOtp);
 router.post('/reset-password', adminControllers.resetPassword);
 
 
-
+// Admin-only routes
 router.get("/stats",auth('admin'), adminControllers.getRideStats);
+router.get("/drivers",auth('admin'), adminControllers.getAllDrivers);
+//driver by user id
+router.get( '/by-user/:userId',auth('admin'),adminControllers.getDriverByUserId);
 
+// Approve or reject driver
+router.patch('/approve/:driverId', auth('admin'), adminControllers.approveDriver);
+router.patch('/reject/:driverId', auth('admin'), adminControllers.rejectDriver);
 
 
 

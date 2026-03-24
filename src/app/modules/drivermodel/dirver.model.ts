@@ -73,6 +73,7 @@ const driverSchema = new Schema<IDriver>(
     stripe_account_id: {
       type: String,
     },
+     isApproved: { type: Boolean, default: false },
 
     // location: {
     //   type: {
