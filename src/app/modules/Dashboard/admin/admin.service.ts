@@ -191,6 +191,109 @@ const getDriverStats = async () => {
 };
 
 
+
+
+
+const getNewUsersLastWeek = async (
+  page: number,
+  limit: number,
+) => {
+  const skip = (page - 1) * limit;
+
+  // last 7 days date
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const query = {
+    createdAt: { $gte: sevenDaysAgo },
+  };
+
+  const users = await User.find(query)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await User.countDocuments(query);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total / limit),
+    },
+    data: users,
+  };
+};
+
+
+
+
+
+const getDriverHoldList = async (
+  page: number,
+  limit: number,
+  searchTerm?: string,
+) => {
+  const skip = (page - 1) * limit;
+
+  const matchStage: any = {
+    isApproved: false, // HOLD drivers
+  };
+
+  const searchMatch = searchTerm
+    ? {
+        $or: [
+          { "user.fullName": { $regex: searchTerm, $options: "i" } },
+          { "user.email": { $regex: searchTerm, $options: "i" } },
+          { "user.phoneNumber": { $regex: searchTerm, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const aggregation = [
+    { $match: matchStage },
+
+    // 🔥 join User collection
+    {
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+
+    { $unwind: "$user" },
+
+    // 🔎 search filter
+    ...(searchTerm ? [{ $match: searchMatch }] : []),
+
+    { $sort: { createdAt: -1 } },
+
+    {
+      $facet: {
+        data: [{ $skip: skip }, { $limit: limit }],
+        total: [{ $count: "count" }],
+      },
+    },
+  ];
+
+  const result = await DriverModel.aggregate(aggregation as any);
+
+  const total = result[0].total[0]?.count || 0;
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total / limit),
+    },
+    data: result[0].data,
+  };
+};
+
 export const adminService = {
   updateAdminProfile,
   changePassword,
@@ -203,4 +306,6 @@ export const adminService = {
   approveDriver,
   rejectDriver,
   getDriverStats,
+  getNewUsersLastWeek,
+  getDriverHoldList,
 };
