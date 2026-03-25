@@ -35,4 +35,23 @@ router.get("/vehicletypes",auth( USER_ROLE.USER), driverController.getDriversByV
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//calculate fare with distance and duration
+router.post("/calculate-fare", auth(USER_ROLE.USER), driverController.getDynamicFareWithDistance);
+
+
+
 export const driverRoutes = router;

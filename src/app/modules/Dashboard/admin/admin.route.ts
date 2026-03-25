@@ -41,6 +41,8 @@ router.patch('/reject/:driverId', auth('admin'), adminControllers.rejectDriver);
 router.get('/new-users',auth('admin'), adminControllers.getNewUsersLastWeek);
 // Get list of drivers on HOLD (not approved yet)
 router.get('/drivers-list', auth('admin'), adminControllers.getDriverHoldList);
+// Get list of all rides
+router.get('/rides', auth('admin'), adminControllers.getAllRidesliste);
 
 
 

@@ -9,6 +9,7 @@ import User from "../user/user.model";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { RideModel } from "../ride/ride.model";
+import { calculateFareByHour, estimateDurationMin, getDistanceInKm } from "../../utils/calculateFare";
 
 
 
@@ -356,6 +357,85 @@ export const getcalcutorprice = async (
 
 
 
+export const createDynamicRideWithDistance = async (
+  pickupLat: number,
+  pickupLng: number,
+  dropLat: number,
+  dropLng: number,
+  radius: number,
+  vehicleType: string,
+  userId: string
+) => {
+  // Find nearest approved driver
+  const drivers = await DriverModel.find({
+    status: "active",
+    isApproved: true,
+    vehicleType,
+    location: {
+      $geoWithin: {
+        $centerSphere: [[pickupLng, pickupLat], radius / 6371],
+      },
+    },
+  }).sort({ updatedAt: 1 });
+
+  if (!drivers.length) return { message: "No driver found", data: [] };
+
+  const driver = drivers[0];
+
+  // Calculate distance & duration dynamically
+  const distanceKm = getDistanceInKm(pickupLat, pickupLng, dropLat, dropLng);
+  const durationMin = estimateDurationMin(distanceKm);
+
+  // Calculate fare using driver.hourRate
+  const fare = calculateFareByHour(driver.hourRate, durationMin);
+
+  // Create ride
+  const ride = await RideModel.create({
+    userId,
+    driverId: driver._id,
+    driveruserID: driver.userId,
+    vehicleType: driver.vehicleType,
+    distance: distanceKm,
+    duration: durationMin,
+    fare,
+    pickupLocation: {
+      type: "Point",
+      coordinates: [pickupLng, pickupLat],
+      address: "Pickup Address",
+    },
+    dropLocation: {
+      type: "Point",
+      coordinates: [dropLng, dropLat],
+      address: "Drop Address",
+    },
+  });
+
+  return { driver, ride };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -596,4 +676,5 @@ export const driverServices = {
   getAddressCoordinate,
   getAddressFromCoordinates,
   getcalcutorprice,
+  createDynamicRideWithDistance,
 };

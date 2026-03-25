@@ -294,6 +294,46 @@ const getDriverHoldList = async (
   };
 };
 
+
+
+//ride liste 
+
+const getAllRides = async (page: number, limit: number) => {
+  const skip = (page - 1) * limit;
+
+  const rides = await RideModel.find()
+    // 👤 Ride creator user
+    .populate({
+      path: 'userId',
+      select: '-password',
+    })
+
+    // 🚚 Driver profile
+    .populate({
+      path: 'driverId',
+      populate: {
+        path: 'userId', // driver → user
+        select: '-password',
+      },
+    })
+
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await RideModel.countDocuments();
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total / limit),
+    },
+    data: rides,
+  };
+};
+
 export const adminService = {
   updateAdminProfile,
   changePassword,
@@ -308,4 +348,5 @@ export const adminService = {
   getDriverStats,
   getNewUsersLastWeek,
   getDriverHoldList,
+  getAllRides,
 };

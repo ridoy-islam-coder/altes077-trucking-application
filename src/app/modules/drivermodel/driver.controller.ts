@@ -225,7 +225,43 @@ export const getcalcutorfar = async (
 };
 
 
+export const getDynamicFareWithDistance = catchAsync(
+  async (req: Request, res: Response) => {
+    const { pickupLat, pickupLng, dropLat, dropLng, radius, vehicleType } =
+      req.query;
+    const userId = req.user?.id;
 
+    if (!userId)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+
+    if (
+      !pickupLat ||
+      !pickupLng ||
+      !dropLat ||
+      !dropLng ||
+      !radius ||
+      !vehicleType
+    )
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing parameters" });
+
+    const result = await driverServices.createDynamicRideWithDistance(
+      Number(pickupLat),
+      Number(pickupLng),
+      Number(dropLat),
+      Number(dropLng),
+      Number(radius),
+      vehicleType as string,
+      userId
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  }
+);
 
 
 
@@ -566,7 +602,7 @@ export const getExactStreetAddressController = async (req: Request, res: Respons
 
 
 export const driverController = {
- 
+ getDynamicFareWithDistance,
   getAutoCompleteController,
   getCaptainsInRadiusController,
   createDriver,

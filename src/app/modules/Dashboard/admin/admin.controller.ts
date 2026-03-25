@@ -367,6 +367,25 @@ const getDriverHoldList = catchAsync(
 );
 
 
+
+
+const getAllRidesliste = catchAsync(
+  async (req: Request, res: Response) => {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const result = await adminService.getAllRides(page, limit);
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Ride list fetched successfully',
+      meta: result.meta,
+      data: result.data,
+    });
+  },
+);
+
 export const adminControllers = {
   adminRegister,
   adminLogin,
@@ -384,5 +403,6 @@ export const adminControllers = {
   getDriverStats,
   getNewUsersLastWeek,
   getDriverHoldList,
+  getAllRidesliste,
 
 };
