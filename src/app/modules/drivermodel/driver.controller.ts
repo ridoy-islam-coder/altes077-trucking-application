@@ -283,6 +283,7 @@ export const createDynamicRideWithDistance = catchAsync(async (req: Request, res
 
   // Step 4: Create ride with schedule & notes
   const ride = await RideModel.create({
+    
     userId,
     driverId: driver._id,
     driveruserID: driver.userId,

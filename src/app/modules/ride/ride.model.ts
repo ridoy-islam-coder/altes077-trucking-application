@@ -115,6 +115,7 @@
 import mongoose, { Schema, model } from "mongoose";
 import { IRide } from "./ride.interface";
 
+
 const locationSchema = new Schema(
   {
     type: {
@@ -154,9 +155,39 @@ const rideSchema = new Schema<IRide>(
       default: "pending",
     },
     rejectedDrivers: [{ type: Schema.Types.ObjectId, ref: "Driver" }],
+    jobId: { type: String, unique: true }, // ✅ unique
   },
   { timestamps: true }
 );
+rideSchema.pre("save", async function(next) {
+  if (this.jobId) return next();
+
+  const prefix = "#JOB";
+  const now = new Date();
+
+  // Date: YYMMDD
+  const yy = now.getFullYear().toString().slice(-1);
+  const mm = (now.getMonth() + 1).toString().padStart(1, "0");
+  const dd = now.getDate().toString().padStart(1, "0");
+  const dateStr = `${yy}${mm}${dd}`;
+
+  // Serial: 2-digit
+  let serial = 1;
+  let jobId = `${prefix}-${dateStr}-${serial.toString().padStart(2, "0")}`;
+
+  // Duplicate check + random suffix (optional)
+  while (await mongoose.models.Ride.exists({ jobId })) {
+    serial++;
+    jobId = `${prefix}-${dateStr}-${serial.toString().padStart(2, "0")}`;
+  }
+
+  // Optional: short random 2-digit number for extra uniqueness
+  // const random = Math.floor(Math.random() * 90 + 10); // 10-99
+  // jobId = `${jobId}-${random}`;
+
+  this.jobId = jobId;
+  next();
+});
 
 // Create 2dsphere index for geo queries
 rideSchema.index({ "pickupLocation": "2dsphere" });

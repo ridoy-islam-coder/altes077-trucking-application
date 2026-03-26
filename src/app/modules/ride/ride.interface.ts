@@ -39,6 +39,7 @@ vehicleType: string; // ✅ Add this field
     // ✅ Add these fields
   driverRating: Number,
   driverReview: String,
+  jobId: string; // ✅ Add unique jobId
 
 }
 
