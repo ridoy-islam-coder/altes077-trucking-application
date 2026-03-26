@@ -246,7 +246,7 @@ export const getPendingRidesForDriver = async (
 ) => {
   const query: any = {
     status: "pending",       // Pending রাইড
-    isApproved: true,        // ✅ only approved drivers
+    // isApproved: true,        // ✅ only approved drivers
     vehicleType,             // Vehicle type অনুযায়ী filter
   };
 

@@ -241,9 +241,9 @@ export const addPickupScheduleController = catchAsync(
     }
 
     // ✅ update pickup schedule
-    latestRide.pickupTime = pickupTime;
-    latestRide.pickupDate = pickupDate;
-    latestRide.userNotes = userNotes;
+    // latestRide.pickupTime = pickupTime;
+    // latestRide.pickupDate = pickupDate;
+    // latestRide.userNotes = userNotes;
 
     await latestRide.save();
 
