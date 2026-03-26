@@ -35,8 +35,8 @@ router.get( '/by-user/:userId',auth('admin'),adminControllers.getDriverByUserId)
 // Driver approval stats count
 router.get("/drivers/stats",auth('admin'), adminControllers.getDriverStats);
 // Approve or reject driver
-router.patch('/approve/:driverId', auth('admin'), adminControllers.approveDriver);
-router.patch('/reject/:driverId', auth('admin'), adminControllers.rejectDriver);
+router.patch('/approve/:id', auth('admin'), adminControllers.approveDriver);
+router.patch('/reject/:id', auth('admin'), adminControllers.rejectDriver);
 // Get new users registered in the last week
 router.get('/new-users',auth('admin'), adminControllers.getNewUsersLastWeek);
 // Get list of drivers on HOLD (not approved yet)

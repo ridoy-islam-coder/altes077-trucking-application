@@ -357,69 +357,39 @@ export const getcalcutorprice = async (
 
 
 
-export const createDynamicRideWithDistance = async (
-  pickupLat: number,
-  pickupLng: number,
-  dropLat: number,
-  dropLng: number,
-  radius: number,
-  vehicleType: string,
-  userId: string
-) => {
-  // Find nearest approved driver
+
+
+
+const getNearbyDrivers = async (pickupLat: number, pickupLng: number, radiusKm: number, vehicleType: string) => {
+  // Step 1: Active approved drivers
   const drivers = await DriverModel.find({
-    status: "active",
+    status: 'active',
     isApproved: true,
     vehicleType,
-    location: {
-      $geoWithin: {
-        $centerSphere: [[pickupLng, pickupLat], radius / 6371],
-      },
-    },
-  }).sort({ updatedAt: 1 });
+  }).lean();
 
-  if (!drivers.length) return { message: "No driver found", data: [] };
+  const nearbyDrivers = [];
 
-  const driver = drivers[0];
+  for (const driver of drivers) {
+    // Step 2: Get driver location from UserModel
+    const user = await User.findById(driver.userId).lean();
+    if (!user?.location?.coordinates) continue;
 
-  // Calculate distance & duration dynamically
-  const distanceKm = getDistanceInKm(pickupLat, pickupLng, dropLat, dropLng);
-  const durationMin = estimateDurationMin(distanceKm);
+    const [lng, lat] = user.location.coordinates;
 
-  // Calculate fare using driver.hourRate
-  const fare = calculateFareByHour(driver.hourRate, durationMin);
+    // Step 3: Calculate distance
+    const distance = getDistanceInKm(pickupLat, pickupLng, lat, lng);
+    if (distance <= radiusKm) {
+      nearbyDrivers.push({
+        driver,
+        location: user.location,
+        distance,
+      });
+    }
+  }
 
-  // Create ride
-  const ride = await RideModel.create({
-    userId,
-    driverId: driver._id,
-    driveruserID: driver.userId,
-    vehicleType: driver.vehicleType,
-    distance: distanceKm,
-    duration: durationMin,
-    fare,
-    pickupLocation: {
-      type: "Point",
-      coordinates: [pickupLng, pickupLat],
-      address: "Pickup Address",
-    },
-    dropLocation: {
-      type: "Point",
-      coordinates: [dropLng, dropLat],
-      address: "Drop Address",
-    },
-  });
-
-  return { driver, ride };
+  return nearbyDrivers;
 };
-
-
-
-
-
-
-
-
 
 
 
@@ -666,6 +636,7 @@ export const getExactStreetAddress = async (lat: number, lng: number): Promise<s
 
 
 export const driverServices = {
+  
   driverCreateService,  
   driverUploadImageService,
   getDistanceTime,
@@ -676,5 +647,5 @@ export const driverServices = {
   getAddressCoordinate,
   getAddressFromCoordinates,
   getcalcutorprice,
-  createDynamicRideWithDistance,
+
 };

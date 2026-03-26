@@ -153,20 +153,39 @@ const getDriverByUserId = async (userId: string) => {
 
   return driver;
 };
+const approveDriver = async (userId: string) => {
+  // ObjectId validation optional (comment out / remove)
+  // if (!Types.ObjectId.isValid(userId)) {
+  //   throw new Error("Invalid user id format");
+  // }
 
-const approveDriver = async (driverId: string) => {
-  const driver = await DriverModel.findById(driverId);
-  if (!driver) throw new Error('Driver not found');
+  // Convert string to ObjectId
+  const driver = await DriverModel.findOne({
+    userId: new Types.ObjectId(userId),
+  });
+
+  if (!driver) {
+    throw new Error("Driver not found with this user");
+  }
 
   driver.isApproved = true;
-  driver.status = 'active'; // optional: activate after approval
+  driver.status = "active";
+
   await driver.save();
+
   return driver;
 };
 
-const rejectDriver = async (driverId: string) => {
-  const driver = await DriverModel.findById(driverId);
-  if (!driver) throw new Error('Driver not found');
+
+const rejectDriver = async (userId: string) => {
+  const driver = await DriverModel.findOne({
+    userId: new Types.ObjectId(userId),
+  });
+
+  if (!driver) {
+    throw new Error("Driver not found with this user");
+  }
+
 
   driver.isApproved = false;
   driver.status = 'inactive'; // optional: deactivate rejected driver

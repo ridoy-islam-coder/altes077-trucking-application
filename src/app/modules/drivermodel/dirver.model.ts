@@ -75,17 +75,17 @@ const driverSchema = new Schema<IDriver>(
     },
      isApproved: { type: Boolean, default: false },
 
-    // location: {
-    //   type: {
-    //     type: String,
-    //     enum: ["Point"],
-    //     default: "Point",
-    //   },
-    //   coordinates: {
-    //     type: [Number],
-    //     // required: true,
-    //   },
-    // },
+// location: {
+//   type: {
+//     type: String,
+//     enum: ["Point"],
+//     default: "Point",
+//   },
+//   coordinates: {
+//     type: [Number],
+//     required: true,
+//   },
+// },
 
     timestamp: {
       type: Date,

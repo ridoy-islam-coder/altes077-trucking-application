@@ -29,9 +29,9 @@ export interface IRide {
   updatedAt?: Date;
   startedAt?: Date;      // এখানে add করা হলো
   completedAt?: Date; 
-  pickupTime: string;
-  pickupDate: string;
-  userNotes?: string; // ✅ Add this field
+  scheduleDate: Date | null; // ✅ Add this field
+  scheduleTime: string | null; // ✅ Add this field
+  workNotes: string; // ✅ Add this field
 distanceText: string; // ✅ Add this field
 durationText: string; // ✅ Add this field
 driveruserID: Types.ObjectId; // ✅ Add this field
@@ -41,3 +41,4 @@ vehicleType: string; // ✅ Add this field
   driverReview: String,
 
 }
+

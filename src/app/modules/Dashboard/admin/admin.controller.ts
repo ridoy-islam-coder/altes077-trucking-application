@@ -280,27 +280,31 @@ const getDriverByUserId = catchAsync(async (req: Request, res: Response) => {
 });
 
 const approveDriver = catchAsync(async (req: Request, res: Response) => {
-  const { driverId } = req.params;
+  const { id } = req.params; // frontend থেকে userId আসবে
 
-  const driver = await adminService.approveDriver(driverId as string);
+  if (!id) throw new Error("User id is required");
+
+  const driver = await adminService.approveDriver(id as string);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Driver approved successfully',
+    message: "Driver approved successfully",
     data: driver,
   });
 });
 
 const rejectDriver = catchAsync(async (req: Request, res: Response) => {
-  const { driverId } = req.params;
+ const { id } = req.params; // frontend থেকে userId আসবে
 
-  const driver = await adminService.rejectDriver(driverId as string);
+  if (!id) throw new Error("User id is required");
+
+  const driver = await adminService.rejectDriver(id as string);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Driver rejected successfully',
+    message: "Driver rejected successfully",
     data: driver,
   });
 });

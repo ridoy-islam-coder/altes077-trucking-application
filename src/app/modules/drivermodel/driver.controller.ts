@@ -8,6 +8,7 @@ import AppError from "../../error/AppError";
 import { DriverModel } from "./dirver.model";
 import User from "../user/user.model";
 import { RideModel } from "../ride/ride.model";
+import { calculateFareByHour,  estimateDurationMin, getDistanceInKm } from "../../utils/calculateFare";
 
 
 
@@ -225,57 +226,92 @@ export const getcalcutorfar = async (
 };
 
 
-export const getDynamicFareWithDistance = catchAsync(
-  async (req: Request, res: Response) => {
-    const { pickupLat, pickupLng, dropLat, dropLng, radius, vehicleType } =
-      req.query;
-    const userId = req.user?.id;
 
-    if (!userId)
-      return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    if (
-      !pickupLat ||
-      !pickupLng ||
-      !dropLat ||
-      !dropLng ||
-      !radius ||
-      !vehicleType
-    )
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing parameters" });
 
-    const result = await driverServices.createDynamicRideWithDistance(
-      Number(pickupLat),
-      Number(pickupLng),
-      Number(dropLat),
-      Number(dropLng),
-      Number(radius),
-      vehicleType as string,
-      userId
-    );
 
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
+
+export const createDynamicRideWithDistance = catchAsync(async (req: Request, res: Response) => {
+  const { pickupLat, pickupLng, dropLat, dropLng, radius, vehicleType } = req.query;
+  const { scheduleDate, scheduleTime, workNotes } = req.body; // ✅ Add from frontend
+  const userId = req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
   }
-);
 
+  if (!pickupLat || !pickupLng || !dropLat || !dropLng || !radius || !vehicleType) {
+    return res.status(400).json({ success: false, message: "Missing parameters" });
+  }
 
+  // Step 1: Find all active & approved drivers with this vehicleType
+  const drivers = await DriverModel.find({
+    status: "active",
+    isApproved: true,
+    vehicleType,
+  }).lean();
 
+  if (!drivers.length) {
+    return res.status(404).json({ success: false, message: "No driver available nearby" });
+  }
 
+  // Step 2: Check each driver location from UserModel
+  let nearbyDriver: any = null;
+  for (const driver of drivers) {
+    const user = await User.findById(driver.userId).lean();
+    if (!user?.location?.coordinates) continue;
 
+    const [lng, lat] = user.location.coordinates;
+    const distance = getDistanceInKm(Number(pickupLat), Number(pickupLng), lat, lng);
 
+    if (distance <= Number(radius)) {
+      nearbyDriver = { driver, location: user.location };
+      break;
+    }
+  }
 
+  if (!nearbyDriver) {
+    return res.status(404).json({ success: false, message: "No driver available nearby" });
+  }
 
+  const driver = nearbyDriver.driver;
 
+  // Step 3: Calculate distance & duration for ride
+  const distanceKm = getDistanceInKm(Number(pickupLat), Number(pickupLng), Number(dropLat), Number(dropLng));
+  const durationMin = estimateDurationMin(distanceKm);
+  const fare = calculateFareByHour(driver.hourRate, durationMin);
 
+  // Step 4: Create ride with schedule & notes
+  const ride = await RideModel.create({
+    userId,
+    driverId: driver._id,
+    driveruserID: driver.userId,
+    vehicleType: driver.vehicleType,
+    distance: distanceKm,
+    duration: durationMin,
+    fare,
+    pickupLocation: {
+      type: "Point",
+      coordinates: [Number(pickupLng), Number(pickupLat)],
+      address: "Pickup Address",
+    },
+    dropLocation: {
+      type: "Point",
+      coordinates: [Number(dropLng), Number(dropLat)],
+      address: "Drop Address",
+    },
+    scheduleDate: scheduleDate ? new Date(scheduleDate) : null, // ✅ Date from frontend
+    scheduleTime: scheduleTime || null, // ✅ Time string
+    workNotes: workNotes || "", // ✅ Notes
+  });
 
-
-
-
+  // Step 5: Response
+  res.status(200).json({
+    success: true,
+    message: "Ride created successfully",
+    data: { driver, ride },
+  });
+});
 
 
 
@@ -602,7 +638,8 @@ export const getExactStreetAddressController = async (req: Request, res: Respons
 
 
 export const driverController = {
- getDynamicFareWithDistance,
+  createDynamicRideWithDistance,
+
   getAutoCompleteController,
   getCaptainsInRadiusController,
   createDriver,
