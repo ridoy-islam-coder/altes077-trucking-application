@@ -111,11 +111,11 @@ const UserSchema = new Schema<TUser, UserModel>(
   type: {
     type: String,
     enum: ['Point'],
-    default: 'Point'
+    // default: 'Point'
   },
   coordinates: {
     type: [Number], // ✅ শুধু Number array
-    // required: true
+    
   }
 },
     // ✅ SOCKET FIELD
@@ -145,7 +145,8 @@ const UserSchema = new Schema<TUser, UserModel>(
   },
 );
 
-
+// GEO index for nearby driver search
+UserSchema.index({ location: "2dsphere" });
 
 //👉 Password change না হলে hash করবে না
 
@@ -159,8 +160,7 @@ UserSchema.pre('save', async function (next) {
 });
 
 
-// GEO index for nearby driver search
-UserSchema.index({ location: "2dsphere" });
+
 
 
 
