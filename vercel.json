@@ -10,8 +10,8 @@
     "functions": {
     "src/server.ts": {
       "maxDuration": 30,
-      "memory": 1024,
-      "maxRequestBodySize": 20
+      "memory": 1024
+     
       
     }
   }
