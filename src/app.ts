@@ -35,7 +35,7 @@ app.use(cors({
 // application routes
 app.use('/api/v1', router);
 app.get('/', (req: Request, res: Response) => {
-  res.send('server is running');
+  res.send('server is running successfully');
 });
 app.use(globalErrorHandler);
 
