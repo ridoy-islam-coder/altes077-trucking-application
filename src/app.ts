@@ -10,11 +10,15 @@ import config from './app/config';
 
 const app: Application = express();
 app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
-app.use(express.urlencoded({ extended: true }));
+
+// body parser (✅ ONLY ONCE)
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
 //parsers
-app.use(express.json());// 🔥 MUST
+// app.use(express.json());// 🔥 MUST
 app.use(cookieParser());
 // app.use(
 //   cors({
