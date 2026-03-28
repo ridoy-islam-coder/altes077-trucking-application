@@ -19,7 +19,7 @@ const auth = (...allowedRoles: UserRole[]) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
+      throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized. Please log in.');
     }
 
     const token = authHeader.split(' ')[1];
