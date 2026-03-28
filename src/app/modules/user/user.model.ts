@@ -106,16 +106,15 @@ const UserSchema = new Schema<TUser, UserModel>(
         default: 'active',
       },
     },
-   
  location: {
   type: {
     type: String,
     enum: ['Point'],
-    // default: 'Point'
+    default: 'Point'
   },
   coordinates: {
-    type: [Number], // ✅ শুধু Number array
-    
+    type: [Number],
+    default: [0, 0]
   }
 },
     // ✅ SOCKET FIELD
