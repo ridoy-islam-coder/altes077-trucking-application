@@ -723,7 +723,10 @@ export const getPendingRidesForDriverController = catchAsync(
 
     // ✅ get rides
     const rides = await RideModel.find({
-      userId: userId,
+   $or: [
+        { userId: userId },
+        { driveruserID: userId },
+      ],
       status: { $in: ["accepted", "completed"] },
     })
       .populate({
@@ -773,7 +776,10 @@ export const getPendingRidesForDriverController = catchAsync(
 
     // ✅ fetch completed rides
     const rides = await RideModel.find({
-      userId: userId,
+      $or: [
+        { userId: userId },
+        { driveruserID: userId },
+      ],
       status: "completed",
     })
       .populate("driverId")
@@ -806,7 +812,10 @@ export const getPendingRidesForDriverController = catchAsync(
 
     // ✅ fetch completed rides
     const rides = await RideModel.find({
-      userId: userId,
+      $or: [
+        { userId: userId },
+        { driveruserID: userId },
+      ],
       status: "accepted",
     })
       .populate("driverId")
