@@ -51,18 +51,14 @@ export const createDriver = catchAsync(async (req: Request, res: Response) => {
 export const uploadMultipleDriverImages = catchAsync(
   async (req: Request, res: Response) => {
     const files = req.files as Express.Multer.File[];
-    if (!files || files.length === 0) throw new AppError(httpStatus.BAD_REQUEST, 'No files uploaded');
-    if (!req.user || !req.user.id) throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+    if (!files || files.length === 0) throw new AppError(httpStatus.BAD_REQUEST, "No files uploaded");
+    if (!req.user || !req.user.id) throw new AppError(httpStatus.UNAUTHORIZED, "User not authenticated");
 
     const userId = req.user.id;
 
-    // Find user
-    const user = await User.findById(userId);
-    if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-
     // Find driver linked to this user
-    const driver = await DriverModel.findOne({ userId: user._id });
-    if (!driver) throw new AppError(httpStatus.NOT_FOUND, 'Driver profile not found');
+    const driver = await DriverModel.findOne({ userId });
+    if (!driver) throw new AppError(httpStatus.NOT_FOUND, "Driver profile not found");
 
     const uploadedDrivers = [];
     for (const file of files) {
@@ -73,11 +69,13 @@ export const uploadMultipleDriverImages = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Driver images uploaded successfully',
+      message: "Driver images uploaded successfully",
       data: uploadedDrivers,
     });
   }
 );
+
+
 
  const getAllDrivers = catchAsync(async (req: Request, res: Response) => {
   // সব driver data fetch + related user data

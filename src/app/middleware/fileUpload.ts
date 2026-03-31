@@ -5,7 +5,7 @@ const fileUpload = () => {
   const upload = multer({
     storage: memoryStorage(),
     limits: {
-      fileSize: 20000000, // Limit file size to 20MB
+      fileSize: 20 * 1024 * 1024, // Limit file size to 20MB
     },
     fileFilter: function (req: Request, file, cb) {
       const allowedTypes = [

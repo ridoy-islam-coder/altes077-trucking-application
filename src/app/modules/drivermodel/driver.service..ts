@@ -49,23 +49,22 @@ export const driverCreateService = async (userId: string, data: {
 
 
 
+
 const MAX_IMAGES = 4;
 
 export const driverUploadImageService = async (driverId: string, file: Express.Multer.File) => {
   const driver = await DriverModel.findById(driverId);
-  if (!driver) throw new AppError(httpStatus.NOT_FOUND, 'Driver not found');
+  if (!driver) throw new AppError(httpStatus.NOT_FOUND, "Driver not found");
 
-  if (driver.images.length >= MAX_IMAGES) throw new AppError(httpStatus.BAD_REQUEST, `Cannot upload more than ${MAX_IMAGES} images`);
+  if (driver.images.length >= MAX_IMAGES) 
+    throw new AppError(httpStatus.BAD_REQUEST, `Cannot upload more than ${MAX_IMAGES} images`);
 
-  // const { id, url } = await uploadToS3(file, `driver-${driverId}-${Date.now()}`);
-  const { id, url } = await uploadToS3(file,`driver-${driverId}-${Date.now()}`);
+  const { id, url } = await uploadToS3(file, `driver-${driverId}-${Date.now()}`);
   driver.images.push({ id, url });
   await driver.save();
 
   return driver;
 };
-
-
 
 
 
