@@ -51,7 +51,8 @@ router.get("/vehicletypes",auth( USER_ROLE.USER), driverController.getDriversByV
 
 //calculate fare with distance and duration
 router.post("/calculate-fare", auth(USER_ROLE.USER), driverController.createDynamicRideWithDistance);
-
+// 🔥 Nearby Drivers Route
+router.post("/nearby-drivers",auth(USER_ROLE.USER), driverController.getAllNearbyDriversdata);
 
 
 export const driverRoutes = router;

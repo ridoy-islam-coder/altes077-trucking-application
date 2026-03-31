@@ -1,6 +1,7 @@
 import { Server as HttpServer } from 'http';
 import { Server as IOServer, Socket } from 'socket.io';
 import User from './app/modules/user/user.model';
+import { getuserdata } from './app/modules/notification/userdatasoket';
 
 const initializeSocketIO = (server: HttpServer): IOServer => {
   const io = new IOServer(server, {
@@ -22,6 +23,11 @@ const initializeSocketIO = (server: HttpServer): IOServer => {
       const roomName = `${role}-${userId}`.toLowerCase(); // lowercase convenience
       socket.join(roomName);
       console.log(`✅ Joined room: ${roomName}`);
+      
+
+      const user = await getuserdata({io,userId,});
+
+
 
       // socketId save করা
       const updatedUser = await User.findByIdAndUpdate(
@@ -31,11 +37,21 @@ const initializeSocketIO = (server: HttpServer): IOServer => {
       );
       console.log('✅ socketId saved =>', updatedUser?.socketId);
 
+
+
+
       // disconnect হলে socketId clear করা
       socket.on('disconnect', async () => {
         console.log('❌ DISCONNECTED:', socket.id);
         await User.findByIdAndUpdate(userId, { socketId: null });
       });
+
+
+
+
+
+
+
 
     } catch (error) {
       console.error('Socket Error:', error);

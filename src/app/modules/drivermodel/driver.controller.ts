@@ -9,6 +9,7 @@ import { DriverModel } from "./dirver.model";
 import User from "../user/user.model";
 import { RideModel } from "../ride/ride.model";
 import { calculateFareByHour,  estimateDurationMin, getDistanceInKm } from "../../utils/calculateFare";
+import mongoose from "mongoose";
 
 
 
@@ -109,8 +110,9 @@ export const uploadMultipleDriverImages = catchAsync(
   if (!user) throw new Error("User not found");
 
   // Driver data linked to this user
-  const driver = await DriverModel.findOne({ userId })
-    .lean();
+ const driver = await DriverModel.findOne({
+   userId: new mongoose.Types.ObjectId(userId),
+}).lean();
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -638,9 +640,88 @@ export const getExactStreetAddressController = async (req: Request, res: Respons
 };
 
 
+export const getAllNearbyDriversdata = catchAsync(
+  async (req: Request, res: Response) => {
+    const { lat, lng, radius } = req.body;
+
+    if (!lat || !lng) {
+      throw new Error("lat & lng required");
+    }
+
+    // meter convert
+    const searchRadius = radius ? Number(radius) : 10000; // default 10km
+
+    const drivers = await User.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: "Point",
+            coordinates: [Number(lng), Number(lat)],
+          },
+          distanceField: "distance",
+          maxDistance: searchRadius,
+          spherical: true,
+          query: {
+            role: "DRIVER",
+            status: "active",
+            isVerified: true,
+          },
+        },
+      },
+
+      // 🔥 driver model join
+      {
+        $lookup: {
+          from: "drivers",
+          localField: "_id",
+          foreignField: "userId",
+          as: "driver",
+        },
+      },
+
+      {
+        $unwind: "$driver",
+      },
+
+      // ✅ clean output
+      {
+        $project: {
+          fullName: 1,
+          email: 1,
+          phoneNumber: 1,
+          location: 1,
+          distance: 1,
+
+          "driver.vehicleType": 1,
+          "driver.vehicleCapacity": 1,
+          "driver.hourRate": 1,
+          "driver.status": 1,
+          "driver.images": 1,
+        },
+      },
+
+      // optional nearest first
+      {
+        $sort: { distance: 1 },
+      },
+    ]);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "All nearby drivers fetched",
+      data: drivers,
+    });
+  }
+);
+
+
+
+
+
 export const driverController = {
   createDynamicRideWithDistance,
-
+ getAllNearbyDriversdata,
   getAutoCompleteController,
   getCaptainsInRadiusController,
   createDriver,
