@@ -640,18 +640,28 @@ export const getExactStreetAddressController = async (req: Request, res: Respons
 };
 
 
-export const getAllNearbyDriversdata = catchAsync(
-  async (req: Request, res: Response) => {
+
+
+export const getAllNearbyDriversdata = async (
+  req: Request,
+  res: Response
+) => {
+  try {
     const { lat, lng, radius } = req.body;
 
     if (!lat || !lng) {
       throw new Error("lat & lng required");
     }
 
-    // meter convert
-    const searchRadius = radius ? Number(radius) : 10000; // default 10km
+    // radius meter (default 10km)
+    const searchRadius = radius ? Number(radius) : 10000;
 
-    const drivers = await User.aggregate([
+    /**
+     * IMPORTANT:
+     * any[] use করছি কারণ
+     * TypeScript geoNear typing support করে না
+     */
+    const pipeline: any[] = [
       {
         $geoNear: {
           near: {
@@ -669,7 +679,7 @@ export const getAllNearbyDriversdata = catchAsync(
         },
       },
 
-      // 🔥 driver model join
+      // join driver collection
       {
         $lookup: {
           from: "drivers",
@@ -683,7 +693,6 @@ export const getAllNearbyDriversdata = catchAsync(
         $unwind: "$driver",
       },
 
-      // ✅ clean output
       {
         $project: {
           fullName: 1,
@@ -700,23 +709,25 @@ export const getAllNearbyDriversdata = catchAsync(
         },
       },
 
-      // optional nearest first
       {
         $sort: { distance: 1 },
       },
-    ]);
+    ];
 
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
+    const drivers = await User.aggregate(pipeline);
+
+    res.status(httpStatus.OK).json({
       success: true,
       message: "All nearby drivers fetched",
       data: drivers,
     });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
-);
-
-
-
+};
 
 
 export const driverController = {

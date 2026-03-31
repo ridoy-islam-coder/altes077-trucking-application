@@ -214,10 +214,31 @@ UserSchema.pre('findOne', function (next) {
   next();
 });
 
+// UserSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+//   next();
+// });
+
+
 UserSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  const pipeline = this.pipeline();
+
+  const firstStage = pipeline[0] as any;
+
+  // keep geoNear first
+  if (firstStage?.$geoNear) {
+    return next();
+  }
+
+  pipeline.unshift({
+    $match: { isDeleted: { $ne: true } },
+  });
+
   next();
 });
+  // otherwise add filter
+
+
 // Create and export the User model
 const User = model<TUser, UserModel>('User', UserSchema);
 
