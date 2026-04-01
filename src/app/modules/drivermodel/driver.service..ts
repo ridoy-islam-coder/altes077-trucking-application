@@ -407,29 +407,29 @@ const getNearbyDrivers = async (pickupLat: number, pickupLng: number, radiusKm: 
 
 
 
-
 export const getSuggestions = async (
-  lat: string,
-  lng: string
+  address: string
 ): Promise<string[]> => {
 
-  if (!lat || !lng) throw new Error("Latitude and longitude are required");
+  if (!address) throw new Error("Address is required");
 
-  const apiKey =GOOGLE_MAPS_API;
+  const apiKey = GOOGLE_MAPS_API;
   if (!apiKey) throw new Error("Google Maps API key not found");
 
-  // Using Nearby Search API instead of Autocomplete
-  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&key=${apiKey}`;
+  const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+    address
+  )}&key=${apiKey}`;
 
   const response = await axios.get(url);
 
   if (response.data.status !== "OK") {
-    throw new Error(response.data.error_message || "Unable to fetch suggestions");
+    throw new Error(
+      response.data.error_message || "Unable to fetch suggestions"
+    );
   }
 
-  // Map to place names
-  return response.data.results
-    .map((place: any) => place.name)
+  return response.data.predictions
+    .map((place: any) => place.description)
     .filter(Boolean);
 };
 

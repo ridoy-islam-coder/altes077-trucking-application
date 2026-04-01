@@ -363,20 +363,21 @@ export const createDynamicRideWithDistance = catchAsync(async (req: Request, res
 
 
 
-
 export const getAutoSuggestions = async (
   req: Request,
   res: Response,
-
 ) => {
   try {
-    const { lat, lng } = req.query;
+    const { address } = req.query;
 
-    if (!lat || !lng) throw new AppError(httpStatus.BAD_REQUEST, "Latitude and longitude are required");
+    if (!address)
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Address is required"
+      );
 
     const suggestions = await driverServices.getSuggestions(
-      lat as string,
-      lng as string
+      address as string
     );
 
     res.status(200).json({
@@ -385,7 +386,7 @@ export const getAutoSuggestions = async (
     });
 
   } catch (error: any) {
-     res.status(500).json({
+    res.status(500).json({
       success: false,
       message: error.message,
     });
