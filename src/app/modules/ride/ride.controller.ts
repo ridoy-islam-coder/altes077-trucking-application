@@ -921,7 +921,7 @@ const getDriverDashboardController = catchAsync(
 
 export const getRideByIdControllerapi = catchAsync(
   async (req, res) => {
-    const { rideId } = req.params;
+    const { id } = req.params;
       const userId = req.user?.id;
 
     if (!userId) {
@@ -934,7 +934,7 @@ export const getRideByIdControllerapi = catchAsync(
     }
 
 
-    if (!rideId) {
+    if (!id) {
       return sendResponse(res, {
         statusCode: 400,
         success: false,
@@ -944,7 +944,7 @@ export const getRideByIdControllerapi = catchAsync(
     }
 
     const rideData =
-      await rideServices.getRideByIdService(rideId as string);
+      await rideServices.getRideByIdService(id as string);
 
     return sendResponse(res, {
       statusCode: 200,
