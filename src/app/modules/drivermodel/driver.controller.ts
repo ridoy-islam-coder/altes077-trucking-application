@@ -701,6 +701,7 @@ export const getAllNearbyDriversdata = async (
 
           "driver.vehicleType": 1,
           "driver.vehicleCapacity": 1,
+          "driver.isApproved": 1,
           "driver.hourRate": 1,
           "driver.status": 1,
           "driver.images": 1,

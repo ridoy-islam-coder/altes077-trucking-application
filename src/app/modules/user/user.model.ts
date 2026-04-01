@@ -32,7 +32,7 @@ const imageSchema = new Schema({
     type: String,
     required: true,
   },
-   name: { type: String, required: true }, // <-- add this
+  
 });
 // Define the schema for the User model
 const UserSchema = new Schema<TUser, UserModel>(
