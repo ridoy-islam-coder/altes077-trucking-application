@@ -305,8 +305,29 @@ export const getDriverDashboardService = async (driverId: string) => {
   };
 };
 
+
+
+
+
+
+export const getRideByIdService = async (rideId: string) => {
+
+  const ride = await RideModel.findById(rideId)
+    .populate("userId")      // user data
+    .populate("driverId")    // driver data
+    .populate("driveruserID");
+
+  if (!ride) {
+    throw new Error("Ride not found");
+  }
+
+  return ride;
+};
+
+
  export const rideServices = {
   getPendingRidesForDriver,
+  getRideByIdService,
  createRide,
  acceptRide,
  rejectRide,

@@ -918,10 +918,53 @@ const getDriverDashboardController = catchAsync(
 );
 
 
+
+export const getRideByIdControllerapi = catchAsync(
+  async (req, res) => {
+    const { rideId } = req.params;
+      const userId = req.user?.id;
+
+    if (!userId) {
+      return sendResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      });
+    }
+
+
+    if (!rideId) {
+      return sendResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "Ride ID is required",
+        data: null,
+      });
+    }
+
+    const rideData =
+      await rideServices.getRideByIdService(rideId as string);
+
+    return sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Ride data fetched successfully",
+      data: rideData,
+    });
+  }
+);
+
+
+
+
+
+
 export const ridecontroller = {
  createRideController,  
  getRideByIdController,
   listRidesController,
+  getRideByIdControllerapi,
   updateRideStatusController,
     acceptRideController,
     getacceptedRidesController,
