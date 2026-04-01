@@ -406,31 +406,59 @@ const getNearbyDrivers = async (pickupLat: number, pickupLng: number, radiusKm: 
 
 
 
-
 export const getSuggestions = async (
   address: string
-): Promise<string[]> => {
-
+): Promise<
+  {
+    address: string;
+    lat: number;
+    lng: number;
+  }[]
+> => {
   if (!address) throw new Error("Address is required");
 
-  const apiKey = GOOGLE_MAPS_API;
-  if (!apiKey) throw new Error("Google Maps API key not found");
+  if (!GOOGLE_MAPS_API)
+    throw new Error("Google Maps API key not found");
 
-  const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+  // =========================
+  // 1️⃣ AUTOCOMPLETE API
+  // =========================
+  const autoUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
     address
-  )}&key=${apiKey}`;
+  )}&types=geocode&key=${GOOGLE_MAPS_API}`;
 
-  const response = await axios.get(url);
+  const autoResponse = await axios.get(autoUrl);
 
-  if (response.data.status !== "OK") {
+  if (autoResponse.data.status !== "OK") {
     throw new Error(
-      response.data.error_message || "Unable to fetch suggestions"
+      autoResponse.data.error_message ||
+        "Failed to fetch suggestions"
     );
   }
 
-  return response.data.predictions
-    .map((place: any) => place.description)
-    .filter(Boolean);
+  const predictions = autoResponse.data.predictions;
+
+  // =========================
+  // 2️⃣ PLACE DETAILS API
+  // =========================
+  const results = await Promise.all(
+    predictions.map(async (place: any) => {
+      const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=geometry&key=${GOOGLE_MAPS_API}`;
+
+      const detailsResponse = await axios.get(detailsUrl);
+
+      const location =
+        detailsResponse.data.result.geometry.location;
+
+      return {
+        address: place.description,
+        lat: location.lat,
+        lng: location.lng,
+      };
+    })
+  );
+
+  return results;
 };
 
 
