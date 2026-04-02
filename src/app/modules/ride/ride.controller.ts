@@ -956,7 +956,52 @@ export const getRideByIdControllerapi = catchAsync(
 );
 
 
+export const getStartedRideController = catchAsync(
+  async (req, res) => {
+    const driverId = req.user?.id; // driverId from auth middleware
+    const { id } = req.params;
 
+    if (!driverId) {
+      return sendResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      });
+    }
+
+    if (!id) {
+      return sendResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "Ride ID is required",
+        data: null,
+      });
+    }
+
+    const ride = await RideModel.findOne({
+      _id: id,
+      driverId,
+      status: "started",
+    });
+
+    if (!ride) {
+      return sendResponse(res, {
+        statusCode: 404,
+        success: false,
+        message: "No started ride found for this driver",
+        data: null,
+      });
+    }
+
+    return sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Started ride data fetched successfully",
+      data: ride,
+    });
+  }
+);
 
 
 
@@ -964,6 +1009,7 @@ export const ridecontroller = {
  createRideController,  
  getRideByIdController,
   listRidesController,
+  getStartedRideController,
   getRideByIdControllerapi,
   updateRideStatusController,
     acceptRideController,

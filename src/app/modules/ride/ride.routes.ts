@@ -95,6 +95,9 @@ router.get("/pending",auth(USER_ROLE.DRIVER), ridecontroller.getPendingRidesForD
 // Get ride history for user data 
 router.get("/all-accepted-completed", auth(USER_ROLE.USER,USER_ROLE.DRIVER), ridecontroller.getRideHistoryController);
 router.get("/rideId/:id", auth(USER_ROLE.DRIVER), ridecontroller.getRideByIdControllerapi);
+
+router.get("/rideapi/:id", auth(USER_ROLE.DRIVER), ridecontroller.getStartedRideController);
+
 router.get("/all-accepted", auth(USER_ROLE.USER,USER_ROLE.DRIVER), ridecontroller.getacceptedRidesController);
 router.get("/all-completed", auth(USER_ROLE.USER,USER_ROLE.DRIVER), ridecontroller.getCompletedRidesController);
 
