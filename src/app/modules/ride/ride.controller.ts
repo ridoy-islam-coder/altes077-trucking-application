@@ -511,6 +511,40 @@ export const adjustFareController = catchAsync(async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const rateDriverController = catchAsync(async (req, res) => {
   const { rating, review } = req.body;
 
@@ -981,8 +1015,9 @@ export const getStartedRideController = catchAsync(
 
     const ride = await RideModel.findOne({
       _id: id,
-      driverId,
       status: "started",
+     driveruserID: driverId 
+
     });
 
     if (!ride) {
@@ -1005,6 +1040,48 @@ export const getStartedRideController = catchAsync(
 
 
 
+
+
+
+export const getRideByIdshopayment = catchAsync(
+  async (req, res) => {
+    const { id } = req.params;
+      const userId = req.user?.id;
+
+    if (!userId) {
+      return sendResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      });
+    }
+
+
+    if (!id) {
+      return sendResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "Ride ID is required",
+        data: null,
+      });
+    }
+
+    const rideData =await rideServices.shopaymentdataService(id as string);
+
+    return sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Ride data fetched successfully",
+      data: rideData,
+    });
+  }
+);
+
+
+
+
+
 export const ridecontroller = {
  createRideController,  
  getRideByIdController,
@@ -1012,6 +1089,7 @@ export const ridecontroller = {
   getStartedRideController,
   getRideByIdControllerapi,
   updateRideStatusController,
+  getRideByIdshopayment,
     acceptRideController,
     getacceptedRidesController,
     // rejectRideController,

@@ -326,6 +326,19 @@ export const getRideByIdService = async (rideId: string) => {
 
 
 
+export const shopaymentdataService = async (rideId: string) => {
+
+  const ride = await RideModel.findById(rideId)
+    .populate("driverId","hourRate,vehicleType")    // driver data
+    
+
+
+  if (!ride) {
+    throw new Error("Ride not found");
+  }
+
+  return ride;
+};
 
 
 
@@ -335,6 +348,7 @@ export const getRideByIdService = async (rideId: string) => {
 
  export const rideServices = {
   getPendingRidesForDriver,
+  shopaymentdataService,
   getRideByIdService,
  createRide,
  acceptRide,

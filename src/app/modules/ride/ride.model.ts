@@ -154,6 +154,12 @@ const rideSchema = new Schema<IRide>(
       enum: ["pending", "accepted", "started", "completed", "cancel"],
       default: "pending",
     },
+     
+    distentcost: { type: Number, default: 15 },
+    hourscost: { type: Number, default: 10 },
+    servicecharge: { type: Number, default: 2 },
+
+
     rejectedDrivers: [{ type: Schema.Types.ObjectId, ref: "Driver" }],
     jobId: { type: String, unique: true }, // ✅ unique
   },

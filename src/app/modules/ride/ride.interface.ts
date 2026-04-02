@@ -37,6 +37,9 @@ durationText: string; // ✅ Add this field
 driveruserID: Types.ObjectId; // ✅ Add this field
 vehicleType: string; // ✅ Add this field
     // ✅ Add these fields
+    distentcost: number;
+    hourscost: number;
+    servicecharge: number;
   driverRating: Number,
   driverReview: String,
   jobId: string; // ✅ Add unique jobId

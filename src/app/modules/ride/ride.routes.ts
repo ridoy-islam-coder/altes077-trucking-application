@@ -111,4 +111,8 @@ router.get("/driver-dashboard", auth(USER_ROLE.DRIVER), ridecontroller.getDriver
 
 
 
+
+//sho payment data for driver
+router.get("/shopayment/:id", auth(USER_ROLE.USER, USER_ROLE.DRIVER), ridecontroller.getRideByIdshopayment);
+
 export const authride = router;
